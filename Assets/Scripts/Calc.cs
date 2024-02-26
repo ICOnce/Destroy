@@ -8,8 +8,8 @@ public class Calc : MonoBehaviour
     Vector3[] vertices;
     int[] triangles;
 
-    private List<float> vertice1 = new List<float>();
-    private List<float> vertice2 = new List<float>();
+    private List<Vector3> vertice1 = new List<Vector3>();
+    private List<Vector3> vertice2 = new List<Vector3>();
 
     private float sideDecider;
     private float det;
@@ -25,27 +25,34 @@ public class Calc : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKey(KeyCode.Space)) Destruction();
+        if (Input.GetKeyDown(KeyCode.Space)) Destruction();
     }
 
     private void Destruction()
     {
-        Vector3 normal = new Vector3(Random.Range(0, 1), Random.Range(0, 1), Random.Range(0, 1));
-        for (int i = 0; i < target.GetComponent<Mesh>().vertices.Length; i++)
+        //Vector3 normal = new Vector3(Random.Range(0, 1), Random.Range(0, 1), Random.Range(0, 1));
+        Vector3 normal = new Vector3(0, 1, 0);
+        Debug.Log(target.GetComponent<MeshFilter>().mesh.vertices.Length);
+        for (int i = 0; i < target.GetComponent<MeshFilter>().mesh.vertices.Length; i++)
         {
-            Vector3 v = target.GetComponent<Mesh>().vertices[i];
+            Vector3 v = target.GetComponent<MeshFilter>().mesh.vertices[i];
             det = -normal.x*pop.x - normal.y*pop.y - normal.z*pop.z;
-            sideDecider = normal.x * v.x + normal.y * v.y + normal.z * v.z + det;
+            Debug.Log(v);
+            sideDecider = normal.x * v.x + normal.y * v.y + normal.z * v.z + det-0.5f;
+            if (sideDecider == 0)
+            {
+                vertice1.Add(v);
+                vertice2.Add(v);
+            }
 
             if (sideDecider > 0)
             {
-                vertice1.Add(sideDecider);
+                vertice1.Add(v);
             }
-            else
+            if (sideDecider < 0)
             {
-                vertice2.Add(sideDecider);  
+                vertice2.Add(v);
             }
         }
-        target.GetComponent<Mesh>().vertices[1] = new Vector3(1,1,1);
     }
 }
