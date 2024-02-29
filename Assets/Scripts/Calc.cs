@@ -38,7 +38,7 @@ public class Calc : MonoBehaviour
             Vector3 v = target.GetComponent<MeshFilter>().mesh.vertices[i];
             det = -normal.x*pop.x - normal.y*pop.y - normal.z*pop.z;
             Debug.Log(v);
-            sideDecider = normal.x * v.x + normal.y * v.y + normal.z * v.z + det-0.5f;
+            sideDecider = normal.x * v.x + normal.y * v.y + normal.z * v.z + det;
             if (sideDecider == 0)
             {
                 vertice1.Add(v);
