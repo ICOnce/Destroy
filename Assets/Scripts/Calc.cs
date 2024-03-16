@@ -37,31 +37,46 @@ public class Calc : MonoBehaviour
         vertice2.Clear();
         //Vector3 normal = new Vector3(Random.Range(0, 1), Random.Range(0, 1), Random.Range(0, 1));
         normal = new Vector3(2, 4, 1);
-
-        for (int i = 0; i < target.GetComponent<MeshFilter>().mesh.triangles.Length; i++)
+        int trias1 = 0;
+        int trias2 = 0;
+        for (int i = 0; i < target.GetComponent<MeshFilter>().mesh.triangles.Length; i+= 3)
         {
             Vector3 v1 = target.GetComponent<MeshFilter>().mesh.vertices[target.GetComponent<MeshFilter>().mesh.triangles[i + 0]];
             Vector3 v2 = target.GetComponent<MeshFilter>().mesh.vertices[target.GetComponent<MeshFilter>().mesh.triangles[i + 1]];
             Vector3 v3 = target.GetComponent<MeshFilter>().mesh.vertices[target.GetComponent<MeshFilter>().mesh.triangles[i + 2]];
-            if (SideDecider(v1) > 0 && SideDecider(v2) > 0 && SideDecider(v3) > 0)
+            if (!(SideDecider(v1) > 0 && SideDecider(v2) > 0 && SideDecider(v3) > 0 || SideDecider(v1) < 0 && SideDecider(v2) < 0 && SideDecider(v3) < 0))
+            {
+                if (SideDecider(v1) > 0 && SideDecider(v2) > 0 && SideDecider(v3) < 0)
+                {
+                    vertice1.Add(v1);
+                    vertice1.Add(v2);
+                    vertice1.Add(Intersect(v3, v1));
+                    vertice1.Add(Intersect(v3, v2));
+
+                    vertice2.Add(Intersect(v3, v1));
+                    vertice2.Add(Intersect(v3, v2));
+                    vertice2.Add(v3);
+                }
+            }
+            else if (SideDecider(v1) > 0 && SideDecider(v2) > 0 && SideDecider(v3) > 0)
             {
                 vertice1.Add(v1);
                 vertice1.Add(v2);
                 vertice1.Add(v3);
-                tris1.Add(i + 0);
-                tris1.Add(i + 1);
-                tris1.Add(i + 2);
+                tris1.Add(trias1 + 0);
+                tris1.Add(trias1 + 1);
+                tris1.Add(trias1 + 2);
+                trias1 += 3;
             }
-            else if (SideDecider(v1) > 0 && SideDecider(v2) > 0 && SideDecider(v3) < 0)
+            else if (SideDecider(v1) < 0 && SideDecider(v2) < 0 && SideDecider(v3) < 0) 
             {
-                vertice1.Add(v1);
-                vertice1.Add(v2);
-                vertice1.Add(Intersect(v3, v1));
-                vertice1.Add(Intersect(v3, v2));
-
-                vertice2.Add(Intersect(v3, v1));
-                vertice2.Add(Intersect(v3, v2));
+                vertice2.Add(v1);
+                vertice2.Add(v2);
                 vertice2.Add(v3);
+                tris2.Add(trias2 + 0);
+                tris2.Add(trias2 + 1);
+                tris2.Add(trias2 + 2);
+                trias2 += 3;
             }
         }
     }
