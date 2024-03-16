@@ -57,6 +57,31 @@ public class Calc : MonoBehaviour
                     vertice2.Add(Intersect(v3, v2));
                     vertice2.Add(v3);
                 }
+
+                else if (SideDecider(v1) > 0 && SideDecider(v2) < 0 && SideDecider(v3) > 0)
+                {
+
+                }
+
+                else if (SideDecider(v1) < 0 && SideDecider(v2) > 0 && SideDecider(v3) > 0)
+                {
+
+                }
+
+                else if (SideDecider(v1) > 0 && SideDecider(v2) < 0 && SideDecider(v3) < 0)
+                {
+
+                }
+
+                else if (SideDecider(v1) < 0 && SideDecider(v2) > 0 && SideDecider(v3) < 0)
+                {
+
+                }
+
+                else if (SideDecider(v1) < 0 && SideDecider(v2) < 0 && SideDecider(v3) > 0)
+                {
+
+                }
             }
             else if (SideDecider(v1) > 0 && SideDecider(v2) > 0 && SideDecider(v3) > 0)
             {
