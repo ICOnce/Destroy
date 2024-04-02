@@ -113,7 +113,13 @@ public class Calc : MonoBehaviour
 
                 }
 
-                //13: OPP
+                //13: POP
+                else if (SideDecider(v1) == 0 && SideDecider(v2) > 0 && SideDecider(v3) == 0)
+                {
+
+                }
+
+                //14: OPP
                 else if (SideDecider(v1) > 0 && SideDecider(v2) == 0 && SideDecider(v3) == 0)
                 {
 
@@ -143,38 +149,56 @@ public class Calc : MonoBehaviour
 
                 }
 
-                //19: OUP
+                //19: PUP
+                else if (SideDecider(v1) == 0 && SideDecider(v2) < 0 && SideDecider(v3) == 0)
+                {
+
+                }
+
+                //20: UPP
+                else if (SideDecider(v1) < 0 && SideDecider(v2) == 0 && SideDecider(v3) == 0)
+                {
+
+                }
+
+                //21: OUP
                 else if (SideDecider(v1) > 0 && SideDecider(v2) < 0 && SideDecider(v3) == 0)
                 {
 
                 }
 
-                //20: UOP
+                //22: UOP
                 else if (SideDecider(v1) < 0 && SideDecider(v2) > 0 && SideDecider(v3) == 0)
                 {
 
                 }
 
-                //21: OPU
+                //23: OPU
                 else if (SideDecider(v1) > 0 && SideDecider(v2) == 0 && SideDecider(v3) < 0)
                 {
 
                 }
 
-                //22: UPO
+                //24: UPO
                 else if (SideDecider(v1) < 0 && SideDecider(v2) == 0 && SideDecider(v3) > 0)
                 {
 
                 }
 
-                //23: POU
+                //25: POU
                 else if (SideDecider(v1) == 0 && SideDecider(v2) > 0 && SideDecider(v3) < 0)
                 {
 
                 }
 
-                //24: PUO
+                //26: PUO
                 else if (SideDecider(v1) == 0 && SideDecider(v2) < 0 && SideDecider(v3) > 0)
+                {
+
+                }
+
+                //27: PPP
+                else if (SideDecider(v1) == 0 && SideDecider(v2) == 0 && SideDecider(v3) == 0)
                 {
 
                 }
