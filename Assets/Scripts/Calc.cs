@@ -46,6 +46,7 @@ public class Calc : MonoBehaviour
             Vector3 v3 = target.GetComponent<MeshFilter>().mesh.vertices[target.GetComponent<MeshFilter>().mesh.triangles[i + 2]];
             if (!(SideDecider(v1) > 0 && SideDecider(v2) > 0 && SideDecider(v3) > 0 || SideDecider(v1) < 0 && SideDecider(v2) < 0 && SideDecider(v3) < 0))
             {
+                //3: OOU
                 if (SideDecider(v1) > 0 && SideDecider(v2) > 0 && SideDecider(v3) < 0)
                 {
                     vertice1.Add(v1);
@@ -58,31 +59,128 @@ public class Calc : MonoBehaviour
                     vertice2.Add(v3);
                 }
 
+                //4: OUO
                 else if (SideDecider(v1) > 0 && SideDecider(v2) < 0 && SideDecider(v3) > 0)
                 {
 
                 }
 
+                //5: UOO
                 else if (SideDecider(v1) < 0 && SideDecider(v2) > 0 && SideDecider(v3) > 0)
                 {
 
                 }
 
+                //6: OUU
                 else if (SideDecider(v1) > 0 && SideDecider(v2) < 0 && SideDecider(v3) < 0)
                 {
 
                 }
 
+                //7: UOU
                 else if (SideDecider(v1) < 0 && SideDecider(v2) > 0 && SideDecider(v3) < 0)
                 {
 
                 }
 
+                //8: UUO
                 else if (SideDecider(v1) < 0 && SideDecider(v2) < 0 && SideDecider(v3) > 0)
                 {
 
                 }
+
+                //9: OOP
+                else if (SideDecider(v1) > 0 && SideDecider(v2) > 0 && SideDecider(v3) == 0) 
+                {
+                    
+                }
+
+                //10: OPO
+                else if (SideDecider(v1) > 0 && SideDecider(v2) == 0 && SideDecider(v3) > 0)
+                {
+
+                }
+
+                //11: POO
+                else if (SideDecider(v1) == 0 && SideDecider(v2) > 0 && SideDecider(v3) > 0)
+                {
+
+                }
+
+                //12: PPO
+                else if (SideDecider(v1) == 0 && SideDecider(v2) == 0 && SideDecider(v3) > 0)
+                {
+
+                }
+
+                //13: OPP
+                else if (SideDecider(v1) > 0 && SideDecider(v2) == 0 && SideDecider(v3) == 0)
+                {
+
+                }
+
+                //15: UUP
+                else if (SideDecider(v1) < 0 && SideDecider(v2) < 0 && SideDecider(v3) == 0)
+                {
+
+                }
+
+                //16: UPU
+                else if (SideDecider(v1) < 0 &&  SideDecider(v2) == 0 && SideDecider(v3) < 0)
+                {
+
+                }
+
+                //17: PUU
+                else if (SideDecider(v1) == 0 && SideDecider(v2) < 0 && SideDecider(v3) < 0)
+                {
+
+                }
+
+                //18: PPU
+                else if (SideDecider(v1) == 0 && SideDecider(v2) == 0 && SideDecider(v3) < 0)
+                {
+
+                }
+
+                //19: OUP
+                else if (SideDecider(v1) > 0 && SideDecider(v2) < 0 && SideDecider(v3) == 0)
+                {
+
+                }
+
+                //20: UOP
+                else if (SideDecider(v1) < 0 && SideDecider(v2) > 0 && SideDecider(v3) == 0)
+                {
+
+                }
+
+                //21: OPU
+                else if (SideDecider(v1) > 0 && SideDecider(v2) == 0 && SideDecider(v3) < 0)
+                {
+
+                }
+
+                //22: UPO
+                else if (SideDecider(v1) < 0 && SideDecider(v2) == 0 && SideDecider(v3) > 0)
+                {
+
+                }
+
+                //23: POU
+                else if (SideDecider(v1) == 0 && SideDecider(v2) > 0 && SideDecider(v3) < 0)
+                {
+
+                }
+
+                //24: PUO
+                else if (SideDecider(v1) == 0 && SideDecider(v2) < 0 && SideDecider(v3) > 0)
+                {
+
+                }
             }
+
+            //1: OOO
             else if (SideDecider(v1) > 0 && SideDecider(v2) > 0 && SideDecider(v3) > 0)
             {
                 vertice1.Add(v1);
@@ -93,6 +191,8 @@ public class Calc : MonoBehaviour
                 tris1.Add(trias1 + 2);
                 trias1 += 3;
             }
+
+            //2: UUU
             else if (SideDecider(v1) < 0 && SideDecider(v2) < 0 && SideDecider(v3) < 0) 
             {
                 vertice2.Add(v1);
