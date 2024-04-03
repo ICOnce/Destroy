@@ -153,6 +153,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 626726690}
+  empty: {fileID: 4507598928457737903, guid: b897cd3ae837da8438386fbdabe0902e, type: 3}
 --- !u!4 &356405714
 Transform:
   m_ObjectHideFlags: 0
