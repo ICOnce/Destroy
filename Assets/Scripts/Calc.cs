@@ -23,8 +23,6 @@ public class Calc : MonoBehaviour
 
     [SerializeField] private GameObject target;
     [SerializeField] private GameObject empty;
-
-    private int check;
     void Start()
     {
         mesh1 = new Mesh();
@@ -41,7 +39,7 @@ public class Calc : MonoBehaviour
         vertice1.Clear();
         vertice2.Clear();
         //Vector3 normal = new Vector3(Random.Range(0, 1), Random.Range(0, 1), Random.Range(0, 1));
-        normal = new Vector3(1, 0, 0);
+        normal = new Vector3(0, 1, 0);
         int trias1 = 0;
         int trias2 = 0;
         for (int i = 0; i < target.GetComponent<MeshFilter>().mesh.triangles.Length; i+= 3)
@@ -84,37 +82,85 @@ public class Calc : MonoBehaviour
                 else if (SideDecider(v1) > 0 && SideDecider(v2) < 0 && SideDecider(v3) > 0)
                 {
                     Debug.Log("OUO");
+                    vertice1.Add(Intersect(v1, v2));
+                    vertice1.Add(v3);
+                    vertice1.Add(v1);
+                    tris1.Add(trias1 + 0);
+                    tris1.Add(trias1 + 1);
+                    tris1.Add(trias1 + 2);
+                    trias1 += 3;
+
+                    vertice2.Add(v2);
+                    vertice2.Add(Intersect(v2, v3));
+                    vertice2.Add(Intersect(v2, v1));
+                    tris2.Add(trias2 + 0);
+                    tris2.Add(trias2 + 1);
+                    tris2.Add(trias2 + 2);
+                    trias2 += 3;
+
+                    vertice1.Add(v3);
+                    vertice1.Add(Intersect(v2, v1));
+                    vertice1.Add(Intersect(v2, v3));
+                    tris1.Add(trias1 + 0);
+                    tris1.Add(trias1 + 1);
+                    tris1.Add(trias1 + 2);
+                    trias1 += 3;
                 }
 
                 //5: UOO
                 else if (SideDecider(v1) < 0 && SideDecider(v2) > 0 && SideDecider(v3) > 0)
                 {
                     Debug.Log("UOO");
-                }
+                    vertice2.Add(v1);
+                    vertice2.Add(Intersect(v1, v2));
+                    vertice2.Add(Intersect(v1, v3));
+                    tris2.Add(trias2 + 0);
+                    tris2.Add(trias2 + 1);
+                    tris2.Add(trias2 + 2);
+                    trias2 += 3;
 
-                //6: OUU
-                else if (SideDecider(v1) > 0 && SideDecider(v2) < 0 && SideDecider(v3) < 0)
-                {
-                    Debug.Log("OUU");
                     vertice1.Add(Intersect(v3, v1));
-                    vertice1.Add(Intersect(v3, v2));
+                    vertice1.Add(v2);
                     vertice1.Add(v3);
                     tris1.Add(trias1 + 0);
                     tris1.Add(trias1 + 1);
                     tris1.Add(trias1 + 2);
                     trias1 += 3;
 
-                    vertice2.Add(v1);
-                    vertice2.Add(v2);
+                    vertice1.Add(v3);
+                    vertice1.Add(Intersect(v1, v3));
+                    vertice1.Add(Intersect(v1, v2));
+                    tris1.Add(trias1 + 0);
+                    tris1.Add(trias1 + 1);
+                    tris1.Add(trias1 + 2);
+                    trias1 += 3;
+                }
+
+                //6: OUU
+                else if (SideDecider(v1) > 0 && SideDecider(v2) < 0 && SideDecider(v3) < 0)
+                {
+                    Debug.Log("OUU");
+                    vertice1.Add(v1);
+                    vertice1.Add(Intersect(v2, v1));
+                    vertice1.Add(Intersect(v3, v1));
+                    tris1.Add(trias1 + 0);
+                    tris1.Add(trias1 + 1);
+                    tris1.Add(trias1 + 2);
+                    trias1 += 3;
+
+                    
                     vertice2.Add(Intersect(v3, v1));
+                    vertice2.Add(v2);
+                    vertice2.Add(v3);
                     tris2.Add(trias2 + 0);
                     tris2.Add(trias2 + 1);
                     tris2.Add(trias2 + 2);
                     trias2 += 3;
 
+                    
+                    vertice2.Add(Intersect(v1, v2));
                     vertice2.Add(v2);
-                    vertice2.Add(Intersect(v3, v2));
-                    vertice2.Add(Intersect(v3, v1));
+                    vertice2.Add(Intersect(v1, v3));
                     tris2.Add(trias2 + 0);
                     tris2.Add(trias2 + 1);
                     tris2.Add(trias2 + 2);
@@ -125,6 +171,31 @@ public class Calc : MonoBehaviour
                 else if (SideDecider(v1) < 0 && SideDecider(v2) > 0 && SideDecider(v3) < 0)
                 {
                     Debug.Log("UOU");
+                    vertice2.Add(v3);
+                    vertice2.Add(v1);
+                    vertice2.Add(Intersect(v3, v2));
+                    tris2.Add(trias2 + 0);
+                    tris2.Add(trias2 + 1);
+                    tris2.Add(trias2 + 2);
+                    trias2 += 3;
+
+
+                    vertice1.Add(Intersect(v2, v1));
+                    vertice1.Add(v2);
+                    vertice1.Add(Intersect(v2, v3));
+                    tris1.Add(trias1 + 0);
+                    tris1.Add(trias1 + 1);
+                    tris1.Add(trias1 + 2);
+                    trias1 += 3;
+
+
+                    vertice2.Add(Intersect(v2, v3));
+                    vertice2.Add(v3);
+                    vertice2.Add(Intersect(v2, v1));
+                    tris2.Add(trias2 + 0);
+                    tris2.Add(trias2 + 1);
+                    tris2.Add(trias2 + 2);
+                    trias2 += 3;
                 }
 
                 //8: UUO
@@ -266,25 +337,13 @@ public class Calc : MonoBehaviour
             {
                 Debug.Log("UUU");
                 vertice2.Add(v1);
-                Debug.Log("Vertice added");
                 vertice2.Add(v2);
-                Debug.Log("Vertice added");
                 vertice2.Add(v3);
-                Debug.Log("Vertice added");
                 tris2.Add(trias2 + 0);
                 tris2.Add(trias2 + 1);
                 tris2.Add(trias2 + 2);
                 trias2 += 3;
             }
-            check++;
-            Debug.Log("Done A Step");
-            if (check == target.GetComponent<MeshFilter>().mesh.triangles.Length-1)
-            {
-                Debug.Log("Done Complete");
-                
-
-            }
-                
         }
         Debug.Log("Done Complete V2");
         CreateShape();
