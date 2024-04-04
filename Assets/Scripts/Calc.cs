@@ -9,44 +9,77 @@ public class Calc : MonoBehaviour
 
     Vector3[] vertices;
     int[] triangles;
+    GameObject[] targetss;
 
     private List<Vector3> vertice1 = new List<Vector3>();
     private List<Vector3> vertice2 = new List<Vector3>();
 
     private List<int> tris1 = new List<int>();
     private List<int> tris2 = new List<int>();
-
+    private List<GameObject> targets = new List<GameObject>();
 
 
     private Vector3 pop;
     private Vector3 normal;
+    private float det;
+    private Vector3 m1, m2, m3;
 
-    [SerializeField] private GameObject target;
+    [SerializeField] private Camera cam;
     [SerializeField] private GameObject empty;
     void Start()
     {
-        mesh1 = new Mesh();
-        mesh2 = new Mesh();
+
+        targetss = GameObject.FindGameObjectsWithTag("Starget");
+        targets.Add(targetss[0]);
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space)) Destruction();
+        if (Input.GetKeyDown(KeyCode.Space)) 
+        {
+            for (int i = 0; i < targets.Count ; i++)
+            {
+                Destruction(targets[i]);
+            }
+        }
+        if (Input.GetMouseButtonDown(0))
+        {
+            m1 = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, cam.nearClipPlane));
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            m2 = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, cam.nearClipPlane));
+            normal = Vector3.Normalize(Vector3.Cross(m1-m3, m2-m3));
+            pop = m1;
+            for (int i = 0; i < targets.Count; i++)
+            {
+                Destruction(targets[i]);
+                m3 = targets[i].transform.position;
+                break;
+            }
+        }
     }
 
-    private void Destruction()
+    private void Destruction(GameObject targeted)
     {
+        Debug.Log(pop);
+        mesh1 = new Mesh();
+        mesh2 = new Mesh();
         vertice1.Clear();
         vertice2.Clear();
-        //Vector3 normal = new Vector3(Random.Range(0, 1), Random.Range(0, 1), Random.Range(0, 1));
-        normal = new Vector3(0, 1, 0);
+        tris1.Clear();
+        tris2.Clear();
         int trias1 = 0;
         int trias2 = 0;
-        for (int i = 0; i < target.GetComponent<MeshFilter>().mesh.triangles.Length; i+= 3)
+        for (int i = 0; i < targeted.GetComponent<MeshFilter>().mesh.triangles.Length; i+= 3)
         {
-            Vector3 v1 = target.GetComponent<MeshFilter>().mesh.vertices[target.GetComponent<MeshFilter>().mesh.triangles[i + 0]];
-            Vector3 v2 = target.GetComponent<MeshFilter>().mesh.vertices[target.GetComponent<MeshFilter>().mesh.triangles[i + 1]];
-            Vector3 v3 = target.GetComponent<MeshFilter>().mesh.vertices[target.GetComponent<MeshFilter>().mesh.triangles[i + 2]];
+            Vector3 v1 = targeted.GetComponent<MeshFilter>().mesh.vertices[targeted.GetComponent<MeshFilter>().mesh.triangles[i + 0]];
+            //v1 += targeted.transform.position;
+            Vector3 v2 = targeted.GetComponent<MeshFilter>().mesh.vertices[targeted.GetComponent<MeshFilter>().mesh.triangles[i + 1]];
+            //v2 += targeted.transform.position;
+            Vector3 v3 = targeted.GetComponent<MeshFilter>().mesh.vertices[targeted.GetComponent<MeshFilter>().mesh.triangles[i + 2]];
+            //v3 += targeted.transform.position;
             if (!(SideDecider(v1) > 0 && SideDecider(v2) > 0 && SideDecider(v3) > 0 || SideDecider(v1) < 0 && SideDecider(v2) < 0 && SideDecider(v3) < 0))
             {
                 //3: OOU
@@ -127,7 +160,7 @@ public class Calc : MonoBehaviour
                     tris1.Add(trias1 + 2);
                     trias1 += 3;
 
-                    vertice1.Add(v3);
+                    vertice1.Add(v2);
                     vertice1.Add(Intersect(v1, v3));
                     vertice1.Add(Intersect(v1, v2));
                     tris1.Add(trias1 + 0);
@@ -190,7 +223,7 @@ public class Calc : MonoBehaviour
 
 
                     vertice2.Add(Intersect(v2, v3));
-                    vertice2.Add(v3);
+                    vertice2.Add(v1);
                     vertice2.Add(Intersect(v2, v1));
                     tris2.Add(trias2 + 0);
                     tris2.Add(trias2 + 1);
@@ -202,120 +235,334 @@ public class Calc : MonoBehaviour
                 else if (SideDecider(v1) < 0 && SideDecider(v2) < 0 && SideDecider(v3) > 0)
                 {
                     Debug.Log("UUO");
+                    vertice2.Add(v1);
+                    vertice2.Add(v2);
+                    vertice2.Add(Intersect(v3, v1));
+                    tris2.Add(trias2 + 0);
+                    tris2.Add(trias2 + 1);
+                    tris2.Add(trias2 + 2);
+                    trias2 += 3;
+
+
+                    vertice2.Add(Intersect(v3, v2));
+                    vertice2.Add(Intersect(v3, v1));
+                    vertice2.Add(v2);
+                    tris2.Add(trias2 + 0);
+                    tris2.Add(trias2 + 1);
+                    tris2.Add(trias2 + 2);
+                    trias2 += 3;
+
+
+                    vertice1.Add(Intersect(v3, v1));
+                    vertice1.Add(Intersect(v3, v2));
+                    vertice1.Add(v3);
+                    tris1.Add(trias1 + 0);
+                    tris1.Add(trias1 + 1);
+                    tris1.Add(trias1 + 2);
+                    trias1 += 3;
                 }
 
                 //9: OOP
                 else if (SideDecider(v1) > 0 && SideDecider(v2) > 0 && SideDecider(v3) == 0) 
                 {
                     Debug.Log("OOP");
+                    vertice1.Add(v1);
+                    vertice1.Add(v2);
+                    vertice1.Add(v3);
+                    tris1.Add(trias1 + 0);
+                    tris1.Add(trias1 + 1);
+                    tris1.Add(trias1 + 2);
+                    trias1 += 3;
                 }
 
                 //10: OPO
                 else if (SideDecider(v1) > 0 && SideDecider(v2) == 0 && SideDecider(v3) > 0)
                 {
                     Debug.Log("OPO");
+                    vertice1.Add(v1);
+                    vertice1.Add(v2);
+                    vertice1.Add(v3);
+                    tris1.Add(trias1 + 0);
+                    tris1.Add(trias1 + 1);
+                    tris1.Add(trias1 + 2);
+                    trias1 += 3;
                 }
 
                 //11: POO
                 else if (SideDecider(v1) == 0 && SideDecider(v2) > 0 && SideDecider(v3) > 0)
                 {
                     Debug.Log("POO");
+                    vertice1.Add(v1);
+                    vertice1.Add(v2);
+                    vertice1.Add(v3);
+                    tris1.Add(trias1 + 0);
+                    tris1.Add(trias1 + 1);
+                    tris1.Add(trias1 + 2);
+                    trias1 += 3;
                 }
 
                 //12: PPO
                 else if (SideDecider(v1) == 0 && SideDecider(v2) == 0 && SideDecider(v3) > 0)
                 {
                     Debug.Log("PPO");
+                    vertice1.Add(v1);
+                    vertice1.Add(v2);
+                    vertice1.Add(v3);
+                    tris1.Add(trias1 + 0);
+                    tris1.Add(trias1 + 1);
+                    tris1.Add(trias1 + 2);
+                    trias1 += 3;
                 }
 
                 //13: POP
                 else if (SideDecider(v1) == 0 && SideDecider(v2) > 0 && SideDecider(v3) == 0)
                 {
                     Debug.Log("POP");
+                    vertice1.Add(v1);
+                    vertice1.Add(v2);
+                    vertice1.Add(v3);
+                    tris1.Add(trias1 + 0);
+                    tris1.Add(trias1 + 1);
+                    tris1.Add(trias1 + 2);
+                    trias1 += 3;
                 }
 
                 //14: OPP
                 else if (SideDecider(v1) > 0 && SideDecider(v2) == 0 && SideDecider(v3) == 0)
                 {
                     Debug.Log("OPP");
+                    vertice1.Add(v1);
+                    vertice1.Add(v2);
+                    vertice1.Add(v3);
+                    tris1.Add(trias1 + 0);
+                    tris1.Add(trias1 + 1);
+                    tris1.Add(trias1 + 2);
+                    trias1 += 3;
                 }
 
                 //15: UUP
                 else if (SideDecider(v1) < 0 && SideDecider(v2) < 0 && SideDecider(v3) == 0)
                 {
                     Debug.Log("UUP");
+                    vertice2.Add(v1);
+                    vertice2.Add(v2);
+                    vertice2.Add(v3);
+                    tris2.Add(trias2 + 0);
+                    tris2.Add(trias2 + 1);
+                    tris2.Add(trias2 + 2);
+                    trias2 += 3;
                 }
 
                 //16: UPU
                 else if (SideDecider(v1) < 0 &&  SideDecider(v2) == 0 && SideDecider(v3) < 0)
                 {
                     Debug.Log("UPU");
+                    vertice2.Add(v1);
+                    vertice2.Add(v2);
+                    vertice2.Add(v3);
+                    tris2.Add(trias2 + 0);
+                    tris2.Add(trias2 + 1);
+                    tris2.Add(trias2 + 2);
+                    trias2 += 3;
                 }
 
                 //17: PUU
                 else if (SideDecider(v1) == 0 && SideDecider(v2) < 0 && SideDecider(v3) < 0)
                 {
                     Debug.Log("PUU");
+                    vertice2.Add(v1);
+                    vertice2.Add(v2);
+                    vertice2.Add(v3);
+                    tris2.Add(trias2 + 0);
+                    tris2.Add(trias2 + 1);
+                    tris2.Add(trias2 + 2);
+                    trias2 += 3;
                 }
 
                 //18: PPU
                 else if (SideDecider(v1) == 0 && SideDecider(v2) == 0 && SideDecider(v3) < 0)
                 {
                     Debug.Log("PPU");
+                    vertice2.Add(v1);
+                    vertice2.Add(v2);
+                    vertice2.Add(v3);
+                    tris2.Add(trias2 + 0);
+                    tris2.Add(trias2 + 1);
+                    tris2.Add(trias2 + 2);
+                    trias2 += 3;
                 }
 
                 //19: PUP
                 else if (SideDecider(v1) == 0 && SideDecider(v2) < 0 && SideDecider(v3) == 0)
                 {
                     Debug.Log("PUP");
+                    vertice2.Add(v1);
+                    vertice2.Add(v2);
+                    vertice2.Add(v3);
+                    tris2.Add(trias2 + 0);
+                    tris2.Add(trias2 + 1);
+                    tris2.Add(trias2 + 2);
+                    trias2 += 3;
                 }
 
                 //20: UPP
                 else if (SideDecider(v1) < 0 && SideDecider(v2) == 0 && SideDecider(v3) == 0)
                 {
                     Debug.Log("UPP");
+                    vertice2.Add(v1);
+                    vertice2.Add(v2);
+                    vertice2.Add(v3);
+                    tris2.Add(trias2 + 0);
+                    tris2.Add(trias2 + 1);
+                    tris2.Add(trias2 + 2);
+                    trias2 += 3;
                 }
 
                 //21: OUP
                 else if (SideDecider(v1) > 0 && SideDecider(v2) < 0 && SideDecider(v3) == 0)
                 {
                     Debug.Log("OUP");
+                    vertice1.Add(v3);
+                    vertice1.Add(v1);
+                    vertice1.Add(Intersect(v1, v2));
+                    tris1.Add(trias1 + 0);
+                    tris1.Add(trias1 + 1);
+                    tris1.Add(trias1 + 2);
+                    trias1 += 3;
+
+                    vertice2.Add(v2);
+                    vertice2.Add(v3);
+                    vertice2.Add(Intersect(v2, v1));
+                    tris2.Add(trias2 + 0);
+                    tris2.Add(trias2 + 1);
+                    tris2.Add(trias2 + 2);
+                    trias2 += 3;
                 }
 
                 //22: UOP
                 else if (SideDecider(v1) < 0 && SideDecider(v2) > 0 && SideDecider(v3) == 0)
                 {
                     Debug.Log("UOP");
+                    vertice2.Add(v3);
+                    vertice2.Add(v1);
+                    vertice2.Add(Intersect(v1, v2));
+                    tris2.Add(trias2 + 0);
+                    tris2.Add(trias2 + 1);
+                    tris2.Add(trias2 + 2);
+                    trias2 += 3;
+
+                    vertice1.Add(v2);
+                    vertice1.Add(v3);
+                    vertice1.Add(Intersect(v2, v1));
+                    tris1.Add(trias1 + 0);
+                    tris1.Add(trias1 + 1);
+                    tris1.Add(trias1 + 2);
+                    trias1 += 3;
                 }
 
                 //23: OPU
                 else if (SideDecider(v1) > 0 && SideDecider(v2) == 0 && SideDecider(v3) < 0)
                 {
                     Debug.Log("OPU");
+                    vertice1.Add(v1);
+                    vertice1.Add(v2);
+                    vertice1.Add(Intersect(v1, v3));
+                    tris1.Add(trias1 + 0);
+                    tris1.Add(trias1 + 1);
+                    tris1.Add(trias1 + 2);
+                    trias1 += 3;
+
+                    vertice2.Add(v2);
+                    vertice2.Add(v3);
+                    vertice2.Add(Intersect(v3, v1));
+                    tris2.Add(trias2 + 0);
+                    tris2.Add(trias2 + 1);
+                    tris2.Add(trias2 + 2);
+                    trias2 += 3;
                 }
 
                 //24: UPO
                 else if (SideDecider(v1) < 0 && SideDecider(v2) == 0 && SideDecider(v3) > 0)
                 {
                     Debug.Log("UPO");
+                    vertice2.Add(v1);
+                    vertice2.Add(v2);
+                    vertice2.Add(Intersect(v1, v3));
+                    tris2.Add(trias2 + 0);
+                    tris2.Add(trias2 + 1);
+                    tris2.Add(trias2 + 2);
+                    trias2 += 3;
+
+                    vertice1.Add(v2);
+                    vertice1.Add(v3);
+                    vertice1.Add(Intersect(v3, v1));
+                    tris1.Add(trias1 + 0);
+                    tris1.Add(trias1 + 1);
+                    tris1.Add(trias1 + 2);
+                    trias1 += 3;
                 }
 
                 //25: POU
                 else if (SideDecider(v1) == 0 && SideDecider(v2) > 0 && SideDecider(v3) < 0)
                 {
                     Debug.Log("POU");
+                    vertice1.Add(v3);
+                    vertice1.Add(v1);
+                    vertice1.Add(Intersect(v1, v2));
+                    tris1.Add(trias1 + 0);
+                    tris1.Add(trias1 + 1);
+                    tris1.Add(trias1 + 2);
+                    trias1 += 3;
+
+                    vertice2.Add(v2);
+                    vertice2.Add(v3);
+                    vertice2.Add(Intersect(v2, v1));
+                    tris2.Add(trias2 + 0);
+                    tris2.Add(trias2 + 1);
+                    tris2.Add(trias2 + 2);
+                    trias2 += 3;
                 }
 
                 //26: PUO
                 else if (SideDecider(v1) == 0 && SideDecider(v2) < 0 && SideDecider(v3) > 0)
                 {
                     Debug.Log("PUO");
+                    vertice2.Add(v3);
+                    vertice2.Add(v1);
+                    vertice2.Add(Intersect(v1, v2));
+                    tris2.Add(trias2 + 0);
+                    tris2.Add(trias2 + 1);
+                    tris2.Add(trias2 + 2);
+                    trias2 += 3;
+
+                    vertice1.Add(v2);
+                    vertice1.Add(v3);
+                    vertice1.Add(Intersect(v2, v1));
+                    tris1.Add(trias1 + 0);
+                    tris1.Add(trias1 + 1);
+                    tris1.Add(trias1 + 2);
+                    trias1 += 3;
                 }
 
                 //27: PPP
                 else if (SideDecider(v1) == 0 && SideDecider(v2) == 0 && SideDecider(v3) == 0)
                 {
                     Debug.Log("PPP");
+                    vertice1.Add(v1);
+                    vertice1.Add(v2);
+                    vertice1.Add(v3);
+                    tris1.Add(trias1 + 0);
+                    tris1.Add(trias1 + 1);
+                    tris1.Add(trias1 + 2);
+                    trias1 += 3;
+
+                    vertice2.Add(v1);
+                    vertice2.Add(v2);
+                    vertice2.Add(v3);
+                    tris2.Add(trias2 + 0);
+                    tris2.Add(trias2 + 1);
+                    tris2.Add(trias2 + 2);
+                    trias2 += 3;
                 }
             }
 
@@ -345,15 +592,14 @@ public class Calc : MonoBehaviour
                 trias2 += 3;
             }
         }
-        Debug.Log("Done Complete V2");
-        CreateShape();
+        CreateShape(targeted);
 
     }
 
     public float SideDecider(Vector3 vertex)
     {
-        //float det = -normal.x * pop.x - normal.y * pop.y - normal.z * pop.z;
-        return normal.x * vertex.x + normal.y * vertex.y + normal.z * vertex.z /*+ det*/;
+        det = -normal.x * pop.x - normal.y * pop.y - normal.z * pop.z;
+        return normal.x * vertex.x + normal.y * vertex.y + normal.z * vertex.z + det;
     }
 
     private Vector3 Intersect (Vector3 vert1, Vector3 vert2)
@@ -364,7 +610,8 @@ public class Calc : MonoBehaviour
         float z0 = vert1.z;
 
         Vector3 lineR = vert2 - vert1 ;
-        float t = -(normal.x * x0 + normal.y * y0 + normal.z * z0)/(normal.x * lineR.x + normal.y * lineR.y + normal.z * lineR.z);
+        det = -normal.x * pop.x - normal.y * pop.y - normal.z * pop.z;
+        float t = -(normal.x * x0 + normal.y * y0 + normal.z * z0+det)/(normal.x * lineR.x + normal.y * lineR.y + normal.z * lineR.z);
         Vector3 intersect = new Vector3(
             x0 + lineR.x * t,
             y0 + lineR.y * t,
@@ -372,24 +619,33 @@ public class Calc : MonoBehaviour
         return intersect;
     }
 
-    void CreateShape()
+    void CreateShape(GameObject targeted)
     {
-        mesh1.vertices = vertice1.ToArray();
-        mesh1.triangles = tris1.ToArray();
-        mesh1.RecalculateNormals();
-        mesh1.RecalculateBounds();
-        GameObject temp = Instantiate(empty, Vector3.zero, Quaternion.identity);
-        temp.GetComponent<MeshFilter>().mesh = mesh1;
-        //temp.AddComponent<MeshCollider>();
+        if (vertice1.Count != 0)
+        {
+            mesh1.vertices = vertice1.ToArray();
+            mesh1.triangles = tris1.ToArray();
+            mesh1.RecalculateNormals();
+            mesh1.RecalculateBounds();
+            GameObject temp = Instantiate(empty, targeted.transform.position, Quaternion.identity);
+            temp.GetComponent<MeshFilter>().mesh = mesh1;
+            temp.AddComponent<MeshCollider>().convex = true;
+            targets.Add(temp);
+        }
 
+        if (vertice2.Count != 0)
+        {
+            mesh2.vertices = vertice2.ToArray();
+            mesh2.triangles = tris2.ToArray();
+            mesh2.RecalculateNormals();
+            mesh2.RecalculateBounds();
+            GameObject temp2 = Instantiate(empty, targeted.transform.position, Quaternion.identity);
+            temp2.GetComponent<MeshFilter>().mesh = mesh2;
+            temp2.AddComponent<MeshCollider>().convex = true;
+            targets.Add(temp2);
+        }
 
-        mesh2.vertices = vertice2.ToArray();
-        mesh2.triangles = tris2.ToArray();
-        mesh2.RecalculateNormals();
-        mesh2.RecalculateBounds();
-        GameObject temp2 = Instantiate(empty, Vector3.zero, Quaternion.identity);
-        temp2.GetComponent<MeshFilter>().mesh = mesh2;
-        //temp2.AddComponent<MeshCollider>();
-        Destroy(target);
+        targets.Remove(targeted);
+        Destroy(targeted);
     }
 }
