@@ -7,10 +7,6 @@ public class Calc : MonoBehaviour
     Mesh mesh1;
     Mesh mesh2;
 
-    Vector3[] vertices;
-    int[] triangles;
-    GameObject[] targetss;
-
     private List<Vector3> vertice1 = new List<Vector3>();
     private List<Vector3> vertice2 = new List<Vector3>();
 
@@ -22,48 +18,27 @@ public class Calc : MonoBehaviour
     private Vector3 pop;
     private Vector3 normal;
     private float det;
-    private Vector3 m1, m2, m3;
 
-    [SerializeField] private Camera cam;
     [SerializeField] private GameObject empty;
+
+    private Vector3 p1, p2, p3;
+
     void Start()
     {
-
-        targetss = GameObject.FindGameObjectsWithTag("Starget");
-        targets.Add(targetss[0]);
+        p1 = transform.position;
     }
-
-    void Update()
+    private void OnCollisionEnter(Collision collision)
     {
-        if (Input.GetKeyDown(KeyCode.Space)) 
-        {
-            for (int i = 0; i < targets.Count ; i++)
-            {
-                Destruction(targets[i]);
-            }
-        }
-        if (Input.GetMouseButtonDown(0))
-        {
-            m1 = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, cam.nearClipPlane));
-        }
-
-        if (Input.GetMouseButtonUp(0))
-        {
-            m2 = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, cam.nearClipPlane));
-            normal = Vector3.Normalize(Vector3.Cross(m1-m3, m2-m3));
-            pop = m1;
-            for (int i = 0; i < targets.Count; i++)
-            {
-                Destruction(targets[i]);
-                m3 = targets[i].transform.position;
-                break;
-            }
-        }
+        p2 = collision.GetContact(0).point;
+        p3 = p2 + new Vector3(Random.Range(0,10), Random.Range(0, 10), Random.Range(0, 10)).normalized;
+        normal = Vector3.Cross(p3 - p1, p3 - p2);
+        Debug.Log(normal);
+        Destruction(collision.gameObject);
+        Destroy(gameObject);
     }
 
     private void Destruction(GameObject targeted)
     {
-        Debug.Log(pop);
         mesh1 = new Mesh();
         mesh2 = new Mesh();
         vertice1.Clear();
@@ -75,11 +50,11 @@ public class Calc : MonoBehaviour
         for (int i = 0; i < targeted.GetComponent<MeshFilter>().mesh.triangles.Length; i+= 3)
         {
             Vector3 v1 = targeted.GetComponent<MeshFilter>().mesh.vertices[targeted.GetComponent<MeshFilter>().mesh.triangles[i + 0]];
-            //v1 += targeted.transform.position;
+            v1 += targeted.transform.position;
             Vector3 v2 = targeted.GetComponent<MeshFilter>().mesh.vertices[targeted.GetComponent<MeshFilter>().mesh.triangles[i + 1]];
-            //v2 += targeted.transform.position;
+            v2 += targeted.transform.position;
             Vector3 v3 = targeted.GetComponent<MeshFilter>().mesh.vertices[targeted.GetComponent<MeshFilter>().mesh.triangles[i + 2]];
-            //v3 += targeted.transform.position;
+            v3 += targeted.transform.position;
             if (!(SideDecider(v1) > 0 && SideDecider(v2) > 0 && SideDecider(v3) > 0 || SideDecider(v1) < 0 && SideDecider(v2) < 0 && SideDecider(v3) < 0))
             {
                 //3: OOU
@@ -621,8 +596,13 @@ public class Calc : MonoBehaviour
 
     void CreateShape(GameObject targeted)
     {
+        Vector3 subtract = targeted.transform.position;
         if (vertice1.Count != 0)
         {
+            for (int i = 0 ; i < vertice1.Count; i++)
+            {
+                vertice1[i] -= subtract;
+            }
             mesh1.vertices = vertice1.ToArray();
             mesh1.triangles = tris1.ToArray();
             mesh1.RecalculateNormals();
@@ -635,6 +615,14 @@ public class Calc : MonoBehaviour
 
         if (vertice2.Count != 0)
         {
+            /*for (global::System.Int32   = 0; i < length; i++)
+            {
+                
+            }*/
+            for (int i = 0; i <  vertice2.Count; i++)
+            {
+                vertice2[i] -= subtract;
+            }
             mesh2.vertices = vertice2.ToArray();
             mesh2.triangles = tris2.ToArray();
             mesh2.RecalculateNormals();

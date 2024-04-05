@@ -132,7 +132,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 356405714}
-  - component: {fileID: 356405713}
+  - component: {fileID: 356405715}
   m_Layer: 0
   m_Name: Destroyer
   m_TagString: Untagged
@@ -140,20 +140,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &356405713
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 356405712}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 75734ec6cf5b09344bf3d8f98ad24a3d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cam: {fileID: 963194227}
-  empty: {fileID: 4507598928457737903, guid: b897cd3ae837da8438386fbdabe0902e, type: 3}
 --- !u!4 &356405714
 Transform:
   m_ObjectHideFlags: 0
@@ -169,6 +155,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &356405715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 356405712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e25698df7a60ab45bc697adca7c6b84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  projectile: {fileID: 7875897022313953559, guid: 37b73f6d5c04d8e48a71f5b7d84bf4a6, type: 3}
+  projectileSpeed: 100
+  cam: {fileID: 963194227}
 --- !u!1 &626726690
 GameObject:
   m_ObjectHideFlags: 0
