@@ -14,7 +14,6 @@ public class Calc : MonoBehaviour
     private List<int> tris2 = new List<int>();
     private List<GameObject> targets = new List<GameObject>();
 
-
     private Vector3 pop;
     private Vector3 normal;
     private float det;
@@ -26,14 +25,19 @@ public class Calc : MonoBehaviour
     void Start()
     {
         p1 = transform.position;
+        pop = p1;
     }
     private void OnCollisionEnter(Collision collision)
     {
         p2 = collision.GetContact(0).point;
-        p3 = p2 + new Vector3(Random.Range(0,10), Random.Range(0, 10), Random.Range(0, 10)).normalized;
-        normal = Vector3.Cross(p3 - p1, p3 - p2);
+        p3 = p2 + new Vector3(Random.Range(0, 10), Random.Range(0, 10), Random.Range(0, 10)).normalized;
+        normal = Vector3.Cross(p2 - p1, p3 - p1);
         Debug.Log(normal);
-        Destruction(collision.gameObject);
+        if(collision.gameObject.layer != 3)
+        {
+            Destruction(collision.gameObject);
+        }
+
         Destroy(gameObject);
     }
 
@@ -610,7 +614,7 @@ public class Calc : MonoBehaviour
             GameObject temp = Instantiate(empty, targeted.transform.position, Quaternion.identity);
             temp.GetComponent<MeshFilter>().mesh = mesh1;
             temp.AddComponent<MeshCollider>().convex = true;
-            targets.Add(temp);
+            temp.GetComponent<Rigidbody>().mass = targeted.GetComponent<Rigidbody>().mass / 2;
         }
 
         if (vertice2.Count != 0)
@@ -630,10 +634,8 @@ public class Calc : MonoBehaviour
             GameObject temp2 = Instantiate(empty, targeted.transform.position, Quaternion.identity);
             temp2.GetComponent<MeshFilter>().mesh = mesh2;
             temp2.AddComponent<MeshCollider>().convex = true;
-            targets.Add(temp2);
+            temp2.GetComponent<Rigidbody>().mass = targeted.GetComponent<Rigidbody>().mass/2;
         }
-
-        targets.Remove(targeted);
         Destroy(targeted);
     }
 }
