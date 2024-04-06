@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -9,16 +10,18 @@ public class Calc : MonoBehaviour
 
     private List<Vector3> vertice1 = new List<Vector3>();
     private List<Vector3> vertice2 = new List<Vector3>();
+    private List<Vector3> cuts = new List<Vector3>();
 
     private List<int> tris1 = new List<int>();
     private List<int> tris2 = new List<int>();
-    private List<GameObject> targets = new List<GameObject>();
 
     private Vector3 pop;
     private Vector3 normal;
+    private Vector3 sum;
     private float det;
 
     [SerializeField] private GameObject empty;
+    [SerializeField] private Material mat;
 
     private Vector3 p1, p2, p3;
 
@@ -32,7 +35,6 @@ public class Calc : MonoBehaviour
         p2 = collision.GetContact(0).point;
         p3 = p2 + new Vector3(Random.Range(0, 10), Random.Range(0, 10), Random.Range(0, 10)).normalized;
         normal = Vector3.Cross(p2 - p1, p3 - p1);
-        Debug.Log(normal);
         if(collision.gameObject.layer != 3)
         {
             Destruction(collision.gameObject);
@@ -49,6 +51,7 @@ public class Calc : MonoBehaviour
         vertice2.Clear();
         tris1.Clear();
         tris2.Clear();
+        cuts.Clear();
         int trias1 = 0;
         int trias2 = 0;
         for (int i = 0; i < targeted.GetComponent<MeshFilter>().mesh.triangles.Length; i+= 3)
@@ -88,6 +91,9 @@ public class Calc : MonoBehaviour
                     tris2.Add(trias2 + 1);
                     tris2.Add(trias2 + 2);
                     trias2 += 3;
+
+                    cuts.Add(Intersect(v3, v1));
+                    cuts.Add(Intersect(v3, v2));
                 }
 
                 //4: OUO
@@ -117,6 +123,9 @@ public class Calc : MonoBehaviour
                     tris1.Add(trias1 + 1);
                     tris1.Add(trias1 + 2);
                     trias1 += 3;
+
+                    cuts.Add(Intersect(v2, v3));
+                    cuts.Add(Intersect(v2, v1));
                 }
 
                 //5: UOO
@@ -146,6 +155,9 @@ public class Calc : MonoBehaviour
                     tris1.Add(trias1 + 1);
                     tris1.Add(trias1 + 2);
                     trias1 += 3;
+
+                    cuts.Add(Intersect(v1, v3));
+                    cuts.Add(Intersect(v1, v2));
                 }
 
                 //6: OUU
@@ -177,6 +189,9 @@ public class Calc : MonoBehaviour
                     tris2.Add(trias2 + 1);
                     tris2.Add(trias2 + 2);
                     trias2 += 3;
+
+                    cuts.Add(Intersect(v2, v1));
+                    cuts.Add(Intersect(v3, v1));
                 }
 
                 //7: UOU
@@ -208,6 +223,9 @@ public class Calc : MonoBehaviour
                     tris2.Add(trias2 + 1);
                     tris2.Add(trias2 + 2);
                     trias2 += 3;
+
+                    cuts.Add(Intersect(v2, v3));
+                    cuts.Add(Intersect(v2, v1));
                 }
 
                 //8: UUO
@@ -239,6 +257,9 @@ public class Calc : MonoBehaviour
                     tris1.Add(trias1 + 1);
                     tris1.Add(trias1 + 2);
                     trias1 += 3;
+
+                    cuts.Add(Intersect(v3, v1));
+                    cuts.Add(Intersect(v3, v2));
                 }
 
                 //9: OOP
@@ -252,6 +273,8 @@ public class Calc : MonoBehaviour
                     tris1.Add(trias1 + 1);
                     tris1.Add(trias1 + 2);
                     trias1 += 3;
+
+                    cuts.Add(v3);
                 }
 
                 //10: OPO
@@ -265,6 +288,8 @@ public class Calc : MonoBehaviour
                     tris1.Add(trias1 + 1);
                     tris1.Add(trias1 + 2);
                     trias1 += 3;
+
+                    cuts.Add(v2);
                 }
 
                 //11: POO
@@ -278,6 +303,8 @@ public class Calc : MonoBehaviour
                     tris1.Add(trias1 + 1);
                     tris1.Add(trias1 + 2);
                     trias1 += 3;
+
+                    cuts.Add(v1);
                 }
 
                 //12: PPO
@@ -291,6 +318,9 @@ public class Calc : MonoBehaviour
                     tris1.Add(trias1 + 1);
                     tris1.Add(trias1 + 2);
                     trias1 += 3;
+
+                    cuts.Add(v1);
+                    cuts.Add(v2);
                 }
 
                 //13: POP
@@ -304,6 +334,9 @@ public class Calc : MonoBehaviour
                     tris1.Add(trias1 + 1);
                     tris1.Add(trias1 + 2);
                     trias1 += 3;
+
+                    cuts.Add(v1);
+                    cuts.Add(v3);
                 }
 
                 //14: OPP
@@ -317,6 +350,9 @@ public class Calc : MonoBehaviour
                     tris1.Add(trias1 + 1);
                     tris1.Add(trias1 + 2);
                     trias1 += 3;
+
+                    cuts.Add(v2);
+                    cuts.Add(v3);
                 }
 
                 //15: UUP
@@ -330,6 +366,8 @@ public class Calc : MonoBehaviour
                     tris2.Add(trias2 + 1);
                     tris2.Add(trias2 + 2);
                     trias2 += 3;
+
+                    cuts.Add(v3);
                 }
 
                 //16: UPU
@@ -343,6 +381,8 @@ public class Calc : MonoBehaviour
                     tris2.Add(trias2 + 1);
                     tris2.Add(trias2 + 2);
                     trias2 += 3;
+
+                    cuts.Add(v2);
                 }
 
                 //17: PUU
@@ -356,6 +396,8 @@ public class Calc : MonoBehaviour
                     tris2.Add(trias2 + 1);
                     tris2.Add(trias2 + 2);
                     trias2 += 3;
+
+                    cuts.Add(v1);
                 }
 
                 //18: PPU
@@ -369,6 +411,9 @@ public class Calc : MonoBehaviour
                     tris2.Add(trias2 + 1);
                     tris2.Add(trias2 + 2);
                     trias2 += 3;
+
+                    cuts.Add(v1);
+                    cuts.Add(v2);
                 }
 
                 //19: PUP
@@ -382,6 +427,9 @@ public class Calc : MonoBehaviour
                     tris2.Add(trias2 + 1);
                     tris2.Add(trias2 + 2);
                     trias2 += 3;
+
+                    cuts.Add(v1);
+                    cuts.Add(v3);
                 }
 
                 //20: UPP
@@ -395,6 +443,9 @@ public class Calc : MonoBehaviour
                     tris2.Add(trias2 + 1);
                     tris2.Add(trias2 + 2);
                     trias2 += 3;
+
+                    cuts.Add(v2);
+                    cuts.Add(v3);
                 }
 
                 //21: OUP
@@ -416,6 +467,9 @@ public class Calc : MonoBehaviour
                     tris2.Add(trias2 + 1);
                     tris2.Add(trias2 + 2);
                     trias2 += 3;
+
+                    cuts.Add(v3);
+                    cuts.Add(Intersect(v2, v1));
                 }
 
                 //22: UOP
@@ -437,6 +491,9 @@ public class Calc : MonoBehaviour
                     tris1.Add(trias1 + 1);
                     tris1.Add(trias1 + 2);
                     trias1 += 3;
+
+                    cuts.Add(v3);
+                    cuts.Add(Intersect(v2, v1));
                 }
 
                 //23: OPU
@@ -458,6 +515,9 @@ public class Calc : MonoBehaviour
                     tris2.Add(trias2 + 1);
                     tris2.Add(trias2 + 2);
                     trias2 += 3;
+
+                    cuts.Add(v2);
+                    cuts.Add(Intersect(v3, v1));
                 }
 
                 //24: UPO
@@ -479,6 +539,9 @@ public class Calc : MonoBehaviour
                     tris1.Add(trias1 + 1);
                     tris1.Add(trias1 + 2);
                     trias1 += 3;
+
+                    cuts.Add(v2);
+                    cuts.Add(Intersect(v3, v1));
                 }
 
                 //25: POU
@@ -500,6 +563,9 @@ public class Calc : MonoBehaviour
                     tris2.Add(trias2 + 1);
                     tris2.Add(trias2 + 2);
                     trias2 += 3;
+
+                    cuts.Add(v1);
+                    cuts.Add(Intersect(v2, v1));
                 }
 
                 //26: PUO
@@ -521,6 +587,9 @@ public class Calc : MonoBehaviour
                     tris1.Add(trias1 + 1);
                     tris1.Add(trias1 + 2);
                     trias1 += 3;
+
+                    cuts.Add(v1);
+                    cuts.Add(Intersect(v2, v1));
                 }
 
                 //27: PPP
@@ -542,6 +611,10 @@ public class Calc : MonoBehaviour
                     tris2.Add(trias2 + 1);
                     tris2.Add(trias2 + 2);
                     trias2 += 3;
+
+                    cuts.Add(v1);
+                    cuts.Add(v2);
+                    cuts.Add(v3);
                 }
             }
 
@@ -570,6 +643,66 @@ public class Calc : MonoBehaviour
                 tris2.Add(trias2 + 2);
                 trias2 += 3;
             }
+        }
+
+        foreach (Vector3 vertex in cuts)
+        {
+            sum += vertex;
+        }
+        sum /= cuts.Count;
+        vertice1.AddRange(cuts);
+        vertice2.AddRange(cuts);
+        vertice1.Add(sum);
+        vertice2.Add(sum);
+
+        int length1 = tris1.Count;
+        int length2 = tris2.Count;
+        for(int i = 0; i < cuts.Count; i++)
+        {
+            for (int j = 0; j < length1; j += 3)
+            {
+                for (int k = 0; k < cuts.Count; k++)
+                {
+                    if ((cuts[i] == vertice1[tris1[j]] || cuts[i] == vertice1[tris1[j + 1]] || cuts[i] == vertice1[tris1[j + 2]]) && (cuts[k] == vertice1[tris1[j]] || cuts[k] == vertice1[tris1[j + 1]] || cuts[k] == vertice1[tris1[j + 2]]))
+                    {
+                        if (cuts[k] == vertice1[tris1[j + 1]])
+                        {
+                            tris1.Add(tris1[j]);
+                            tris1.Add(vertice1.Count - 1);
+                            tris1.Add(tris1[j + 1]);
+                        }
+                        else
+                        {
+                            tris1.Add(tris1[j]);
+                            tris1.Add(tris1[j + 2]);
+                            tris1.Add(vertice1.Count - 1);
+                        }
+                    }
+                }
+            }
+
+            for (int j = 0; j < length2; j += 3)
+            {
+                for (int k = 0; k < cuts.Count; k++)
+                {
+                    if (cuts[i] == vertice2[tris2[j]] && (cuts[k] == vertice2[tris2[j + 1]] || cuts[k] == vertice2[tris2[j + 2]]))
+                    {
+                        if (cuts[k] == vertice2[tris2[j + 1]])
+                        {
+                            tris2.Add(tris2[j]);
+                            tris2.Add(vertice2.Count - 1);
+                            tris2.Add(tris2[j + 1]);
+                        }
+                        else
+                        {
+                            tris2.Add(tris2[j]);
+                            tris2.Add(tris2[j + 2]);
+                            tris2.Add(vertice2.Count - 1);
+                        }
+                    }
+                }
+            }
+
         }
         CreateShape(targeted);
 
@@ -633,6 +766,7 @@ public class Calc : MonoBehaviour
             mesh2.RecalculateBounds();
             GameObject temp2 = Instantiate(empty, targeted.transform.position, Quaternion.identity);
             temp2.GetComponent<MeshFilter>().mesh = mesh2;
+            temp2.GetComponent<MeshRenderer>().material = mat;
             temp2.AddComponent<MeshCollider>().convex = true;
             temp2.GetComponent<Rigidbody>().mass = targeted.GetComponent<Rigidbody>().mass/2;
         }
