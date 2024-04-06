@@ -24,7 +24,8 @@ public class Calc : MonoBehaviour
     [SerializeField] private Material mat;
 
     private Vector3 p1, p2, p3;
-
+    private int length1;
+    private int length2;
     void Start()
     {
         p1 = transform.position;
@@ -655,26 +656,71 @@ public class Calc : MonoBehaviour
         vertice1.Add(sum);
         vertice2.Add(sum);
 
-        int length1 = tris1.Count;
-        int length2 = tris2.Count;
+        length1 = tris1.Count;
+        length2 = tris2.Count;
         for(int i = 0; i < cuts.Count; i++)
         {
             for (int j = 0; j < length1; j += 3)
             {
                 for (int k = 0; k < cuts.Count; k++)
                 {
-                    if ((cuts[i] == vertice1[tris1[j]] || cuts[i] == vertice1[tris1[j + 1]] || cuts[i] == vertice1[tris1[j + 2]]) && (cuts[k] == vertice1[tris1[j]] || cuts[k] == vertice1[tris1[j + 1]] || cuts[k] == vertice1[tris1[j + 2]]))
+                    if (cuts[i] == vertice1[tris1[j]] && cuts[k] == vertice1[tris1[j + 1]])
                     {
-                        if (cuts[k] == vertice1[tris1[j + 1]])
+                        if (!Exists(tris1[j], vertice1.Count - 1, tris1[j + 1], 0))
                         {
                             tris1.Add(tris1[j]);
                             tris1.Add(vertice1.Count - 1);
                             tris1.Add(tris1[j + 1]);
                         }
-                        else
+                    }
+
+                    else if (cuts[i] == vertice1[tris1[j]] && cuts[k] == vertice1[tris1[j + 2]])
+                    {
+                        if (!Exists(tris1[j], tris1[j + 2], vertice1.Count - 1, 0))
                         {
                             tris1.Add(tris1[j]);
                             tris1.Add(tris1[j + 2]);
+                            tris1.Add(vertice1.Count - 1);
+
+                        }
+                    }
+
+                    else if (cuts[i] == vertice1[tris1[j + 1]] && cuts[k] == vertice1[tris1[j]])
+                    {
+                        if (!Exists(tris1[j + 1], vertice1.Count - 1, tris1[j], 0))
+                        {
+                            tris1.Add(tris1[j + 1]);
+                            tris1.Add(tris1[j]);
+                            tris1.Add(vertice1.Count - 1);
+                        }
+                    }
+
+                    else if (cuts[i] == vertice1[tris1[j + 1]] && cuts[k] == vertice1[tris1[j + 2]])
+                    {
+                        if (!Exists(tris1[j + 1], tris1[j + 2], vertice1.Count - 1, 0))
+                        {
+                            tris1.Add(tris1[j + 1]);
+                            tris1.Add(vertice1.Count - 1);
+                            tris1.Add(tris1[j + 2]);
+                        }
+                    }
+
+                    else if (cuts[i] == vertice1[tris1[j + 2]] && cuts[k] == vertice1[tris1[j]])
+                    {
+                        if (!Exists(tris1[j + 2], vertice1.Count - 1, tris1[j], 0))
+                        {
+                            tris1.Add(tris1[j + 2]);
+                            tris1.Add(vertice1.Count - 1);
+                            tris1.Add(tris1[j]);
+                        }
+                    }
+
+                    else if (cuts[i] == vertice1[tris1[j + 2]] && cuts[k] == vertice1[tris1[j + 1]])
+                    {
+                        if (!Exists(tris1[j + 2], tris1[j + 1], vertice1.Count - 1, 0))
+                        {
+                            tris1.Add(tris1[j + 2]);
+                            tris1.Add(tris1[j + 1]);
                             tris1.Add(vertice1.Count - 1);
                         }
                     }
@@ -685,18 +731,63 @@ public class Calc : MonoBehaviour
             {
                 for (int k = 0; k < cuts.Count; k++)
                 {
-                    if (cuts[i] == vertice2[tris2[j]] && (cuts[k] == vertice2[tris2[j + 1]] || cuts[k] == vertice2[tris2[j + 2]]))
+                    if (cuts[i] == vertice2[tris2[j]] && cuts[k] == vertice2[tris2[j + 1]])
                     {
-                        if (cuts[k] == vertice2[tris2[j + 1]])
+                        if (!Exists(tris2[j], vertice2.Count - 1, tris2[j + 1], 1))
                         {
                             tris2.Add(tris2[j]);
                             tris2.Add(vertice2.Count - 1);
                             tris2.Add(tris2[j + 1]);
                         }
-                        else
+                    }
+
+                    else if (cuts[i] == vertice2[tris2[j]] && cuts[k] == vertice2[tris2[j + 2]])
+                    {
+                        if (!Exists(tris2[j], tris2[j + 2], vertice2.Count - 1, 1))
                         {
                             tris2.Add(tris2[j]);
                             tris2.Add(tris2[j + 2]);
+                            tris2.Add(vertice2.Count - 1);
+
+                        }
+                    }
+
+                    else if (cuts[i] == vertice2[tris2[j + 1]] && cuts[k] == vertice2[tris2[j]])
+                    {
+                        if (!Exists(tris2[j + 1], vertice2.Count - 1, tris2[j], 1))
+                        {
+                            tris2.Add(tris2[j + 1]);
+                            tris2.Add(tris2[j]);
+                            tris2.Add(vertice2.Count - 1);
+                        }
+                    }
+
+                    else if (cuts[i] == vertice2[tris2[j + 1]] && cuts[k] == vertice2[tris2[j + 2]])
+                    {
+                        if (!Exists(tris2[j + 1], tris2[j + 2], vertice2.Count - 1, 1))
+                        {
+                            tris2.Add(tris2[j + 1]);
+                            tris2.Add(vertice2.Count - 1);
+                            tris2.Add(tris2[j + 2]);
+                        }
+                    }
+
+                    else if (cuts[i] == vertice2[tris2[j + 2]] && cuts[k] == vertice2[tris2[j]])
+                    {
+                        if (!Exists(tris2[j + 2], vertice2.Count - 1, tris2[j], 1))
+                        {
+                            tris2.Add(tris2[j + 2]);
+                            tris2.Add(vertice2.Count - 1);
+                            tris2.Add(tris2[j]);
+                        }
+                    }
+
+                    else if (cuts[i] == vertice2[tris2[j + 2]] && cuts[k] == vertice2[tris2[j + 1]])
+                    {
+                        if (!Exists(tris2[j + 2], tris2[j + 1], vertice2.Count - 1, 1))
+                        {
+                            tris2.Add(tris2[j + 2]);
+                            tris2.Add(tris2[j + 1]);
                             tris2.Add(vertice2.Count - 1);
                         }
                     }
@@ -771,5 +862,49 @@ public class Calc : MonoBehaviour
             temp2.GetComponent<Rigidbody>().mass = targeted.GetComponent<Rigidbody>().mass/2;
         }
         Destroy(targeted);
+    }
+
+    bool Exists(int p1, int p2, int p3, int identifier)
+    {
+        List<int> compare = new List<int>();
+        int compareStart;
+        if (identifier == 0)
+        {
+            compare = tris1;
+            compareStart = length1;
+        }
+        else
+        {
+            compare = tris2;
+            compareStart = length2;
+        }
+        for (int i = compareStart; i < compare.Count; i+= 3)
+        {
+            if (compare[i] == p1 && compare[i + 1] == p2 && compare[i + 2] == p3)
+            {
+                return true;
+            }
+            else if (compare[i] == p1 && compare[i + 1] == p3 && compare[i + 2] == p2)
+            {
+                return true;
+            }
+            else if (compare[i] == p2 && compare[i + 1] == p1 && compare[i + 2] == p3)
+            {
+                return true;
+            }
+            else if (compare[i] == p2 && compare[i + 1] == p3 && compare[i + 2] == p1)
+            {
+                return true;
+            }
+            else if (compare[i] == p3 && compare[i + 1] == p2 && compare[i + 2] == p1)
+            {
+                return true;
+            }
+            else if (compare[i] == p3 && compare[i + 1] == p1 && compare[i + 2] == p2)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
