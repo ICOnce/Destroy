@@ -20,6 +20,7 @@ public class FireAtWill : MonoBehaviour
         {
             GameObject temp = Instantiate(projectile, cam.transform.position, Quaternion.identity);
             temp.AddComponent<Rigidbody>().AddForce(cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 20) - cam.transform.position) * projectileSpeed);
+            temp.GetComponent<Rigidbody>().useGravity = false;
         }
     }
 }
