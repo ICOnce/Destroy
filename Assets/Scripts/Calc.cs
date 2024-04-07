@@ -21,7 +21,7 @@ public class Calc : MonoBehaviour
     private float det;
 
     [SerializeField] private GameObject empty;
-    [SerializeField] private Material mat;
+    private Vector3 oldScale;
 
     private Vector3 p1, p2, p3;
     private int length1;
@@ -33,6 +33,7 @@ public class Calc : MonoBehaviour
     }
     private void OnCollisionEnter(Collision collision)
     {
+        oldScale = collision.transform.localScale;
         p2 = collision.GetContact(0).point;
         p3 = p2 + new Vector3(Random.Range(0, 10), Random.Range(0, 10), Random.Range(0, 10)).normalized;
         normal = Vector3.Cross(p2 - p1, p3 - p1);
@@ -58,11 +59,11 @@ public class Calc : MonoBehaviour
         for (int i = 0; i < targeted.GetComponent<MeshFilter>().mesh.triangles.Length; i+= 3)
         {
             Vector3 v1 = targeted.GetComponent<MeshFilter>().mesh.vertices[targeted.GetComponent<MeshFilter>().mesh.triangles[i + 0]];
-            v1 += targeted.transform.position;
+            v1 = targeted.transform.TransformPoint(v1);
             Vector3 v2 = targeted.GetComponent<MeshFilter>().mesh.vertices[targeted.GetComponent<MeshFilter>().mesh.triangles[i + 1]];
-            v2 += targeted.transform.position;
+            v2 = targeted.transform.TransformPoint(v2);
             Vector3 v3 = targeted.GetComponent<MeshFilter>().mesh.vertices[targeted.GetComponent<MeshFilter>().mesh.triangles[i + 2]];
-            v3 += targeted.transform.position;
+            v3 = targeted.transform.TransformPoint(v3);
             if (!(SideDecider(v1) > 0 && SideDecider(v2) > 0 && SideDecider(v3) > 0 || SideDecider(v1) < 0 && SideDecider(v2) < 0 && SideDecider(v3) < 0))
             {
                 //3: OOU
@@ -829,7 +830,7 @@ public class Calc : MonoBehaviour
         {
             for (int i = 0 ; i < vertice1.Count; i++)
             {
-                vertice1[i] -= subtract;
+                vertice1[i] = targeted.transform.InverseTransformPoint(vertice1[i]);
             }
             mesh1.vertices = vertice1.ToArray();
             mesh1.triangles = tris1.ToArray();
@@ -837,8 +838,11 @@ public class Calc : MonoBehaviour
             mesh1.RecalculateBounds();
             GameObject temp = Instantiate(empty, targeted.transform.position, Quaternion.identity);
             temp.GetComponent<MeshFilter>().mesh = mesh1;
+            temp.GetComponent<MeshRenderer>().material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 1f, 1f);
             temp.AddComponent<MeshCollider>().convex = true;
             temp.GetComponent<Rigidbody>().mass = targeted.GetComponent<Rigidbody>().mass / 2;
+            temp.transform.rotation = targeted.transform.rotation;
+            temp.transform.localScale = oldScale;
         }
 
         if (vertice2.Count != 0)
@@ -849,7 +853,7 @@ public class Calc : MonoBehaviour
             }*/
             for (int i = 0; i <  vertice2.Count; i++)
             {
-                vertice2[i] -= subtract;
+                vertice2[i] = targeted.transform.InverseTransformPoint(vertice2[i]);
             }
             mesh2.vertices = vertice2.ToArray();
             mesh2.triangles = tris2.ToArray();
@@ -857,9 +861,11 @@ public class Calc : MonoBehaviour
             mesh2.RecalculateBounds();
             GameObject temp2 = Instantiate(empty, targeted.transform.position, Quaternion.identity);
             temp2.GetComponent<MeshFilter>().mesh = mesh2;
-            temp2.GetComponent<MeshRenderer>().material = mat;
+            temp2.GetComponent<MeshRenderer>().material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 1f, 1f);
             temp2.AddComponent<MeshCollider>().convex = true;
             temp2.GetComponent<Rigidbody>().mass = targeted.GetComponent<Rigidbody>().mass/2;
+            temp2.transform.rotation = targeted.transform.rotation;
+            temp2.transform.localScale = oldScale;
         }
         Destroy(targeted);
     }
