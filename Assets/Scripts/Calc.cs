@@ -32,16 +32,28 @@ public class Calc : MonoBehaviour
 
     private GameObject temp;
     private GameObject temp2;
+
+    private float timer;
+    private int impact;
     void Start()
     {
+        timer = Time.realtimeSinceStartup;
         depth = 2;
+        impact = 1;
         p1 = transform.position;
-        pop = p1;
+    }
+    private void Update()
+    {
+        if (timer - Time.realtimeSinceStartup < -5)
+        {
+            Destroy(gameObject);
+        }
     }
     private void OnCollisionEnter(Collision collision)
     {
         oldScale = collision.transform.localScale;
         p2 = collision.GetContact(0).point;
+        pop = p2;
         p3 = p2 + new Vector3(Random.Range(0, 10), Random.Range(0, 10), Random.Range(0, 10)).normalized;
         normal = Vector3.Cross(p2 - p1, p3 - p1);
         if(collision.gameObject.layer != 3)
@@ -854,7 +866,7 @@ public class Calc : MonoBehaviour
                 temp.GetComponent<Rigidbody>().mass = targeted.GetComponent<Rigidbody>().mass / 2;
                 temp.transform.rotation = targeted.transform.rotation;
                 temp.transform.localScale = oldScale;
-                temp.GetComponent<Rigidbody>().AddForceAtPosition(p2 - p1, p1);
+                temp.GetComponent<Rigidbody>().AddForceAtPosition((p2 - p1).normalized * impact, p1);
             }
         }
         else
@@ -876,7 +888,7 @@ public class Calc : MonoBehaviour
                 temp3.GetComponent<Rigidbody>().mass = targeted.GetComponent<Rigidbody>().mass / 2;
                 temp3.transform.rotation = targeted.transform.rotation;
                 temp3.transform.localScale = oldScale;
-                temp3.GetComponent<Rigidbody>().AddForceAtPosition(p2 - p1, p1);
+                temp3.GetComponent<Rigidbody>().AddForceAtPosition((p2 - p1).normalized * impact, p1);
             }
         }
 
@@ -903,7 +915,7 @@ public class Calc : MonoBehaviour
             temp2.GetComponent<Rigidbody>().mass = targeted.GetComponent<Rigidbody>().mass/2;
             temp2.transform.rotation = targeted.transform.rotation;
             temp2.transform.localScale = oldScale;
-            temp2.GetComponent<Rigidbody>().AddForceAtPosition(p2 - p1, p2);
+            temp2.GetComponent<Rigidbody>().AddForceAtPosition((p2 - p1).normalized * impact, p2);
         }
         curDepth++;
         Destroy(targeted);
