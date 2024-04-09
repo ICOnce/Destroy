@@ -26,8 +26,15 @@ public class Calc : MonoBehaviour
     private Vector3 p1, p2, p3;
     private int length1;
     private int length2;
+
+    private int depth;
+    private int curDepth;
+
+    private GameObject temp;
+    private GameObject temp2;
     void Start()
     {
+        depth = 2;
         p1 = transform.position;
         pop = p1;
     }
@@ -646,156 +653,158 @@ public class Calc : MonoBehaviour
                 trias2 += 3;
             }
         }
-
-        foreach (Vector3 vertex in cuts)
+        if (cuts.Count != 0)
         {
-            sum += vertex;
-        }
-        sum /= cuts.Count;
-        vertice1.AddRange(cuts);
-        vertice2.AddRange(cuts);
-        vertice1.Add(sum);
-        vertice2.Add(sum);
-
-        length1 = tris1.Count;
-        length2 = tris2.Count;
-        for(int i = 0; i < cuts.Count; i++)
-        {
-            for (int j = 0; j < length1; j += 3)
+            foreach (Vector3 vertex in cuts)
             {
-                for (int k = 0; k < cuts.Count; k++)
+                sum += vertex;
+            }
+            sum /= cuts.Count;
+            vertice1.AddRange(cuts);
+            vertice2.AddRange(cuts);
+            vertice1.Add(sum);
+            vertice2.Add(sum);
+
+            length1 = tris1.Count;
+            length2 = tris2.Count;
+            for (int i = 0; i < cuts.Count; i++)
+            {
+                for (int j = 0; j < length1; j += 3)
                 {
-                    if (cuts[i] == vertice1[tris1[j]] && cuts[k] == vertice1[tris1[j + 1]])
+                    for (int k = 0; k < cuts.Count; k++)
                     {
-                        if (!Exists(tris1[j], vertice1.Count - 1, tris1[j + 1], 0))
+                        if (cuts[i] == vertice1[tris1[j]] && cuts[k] == vertice1[tris1[j + 1]])
                         {
-                            tris1.Add(tris1[j]);
-                            tris1.Add(vertice1.Count - 1);
-                            tris1.Add(tris1[j + 1]);
+                            if (!Exists(tris1[j], vertice1.Count - 1, tris1[j + 1], 0))
+                            {
+                                tris1.Add(tris1[j]);
+                                tris1.Add(vertice1.Count - 1);
+                                tris1.Add(tris1[j + 1]);
+                            }
+                        }
+
+                        else if (cuts[i] == vertice1[tris1[j]] && cuts[k] == vertice1[tris1[j + 2]])
+                        {
+                            if (!Exists(tris1[j], tris1[j + 2], vertice1.Count - 1, 0))
+                            {
+                                tris1.Add(tris1[j]);
+                                tris1.Add(tris1[j + 2]);
+                                tris1.Add(vertice1.Count - 1);
+
+                            }
+                        }
+
+                        else if (cuts[i] == vertice1[tris1[j + 1]] && cuts[k] == vertice1[tris1[j]])
+                        {
+                            if (!Exists(tris1[j + 1], vertice1.Count - 1, tris1[j], 0))
+                            {
+                                tris1.Add(tris1[j + 1]);
+                                tris1.Add(tris1[j]);
+                                tris1.Add(vertice1.Count - 1);
+                            }
+                        }
+
+                        else if (cuts[i] == vertice1[tris1[j + 1]] && cuts[k] == vertice1[tris1[j + 2]])
+                        {
+                            if (!Exists(tris1[j + 1], tris1[j + 2], vertice1.Count - 1, 0))
+                            {
+                                tris1.Add(tris1[j + 1]);
+                                tris1.Add(vertice1.Count - 1);
+                                tris1.Add(tris1[j + 2]);
+                            }
+                        }
+
+                        else if (cuts[i] == vertice1[tris1[j + 2]] && cuts[k] == vertice1[tris1[j]])
+                        {
+                            if (!Exists(tris1[j + 2], vertice1.Count - 1, tris1[j], 0))
+                            {
+                                tris1.Add(tris1[j + 2]);
+                                tris1.Add(vertice1.Count - 1);
+                                tris1.Add(tris1[j]);
+                            }
+                        }
+
+                        else if (cuts[i] == vertice1[tris1[j + 2]] && cuts[k] == vertice1[tris1[j + 1]])
+                        {
+                            if (!Exists(tris1[j + 2], tris1[j + 1], vertice1.Count - 1, 0))
+                            {
+                                tris1.Add(tris1[j + 2]);
+                                tris1.Add(tris1[j + 1]);
+                                tris1.Add(vertice1.Count - 1);
+                            }
                         }
                     }
+                }
 
-                    else if (cuts[i] == vertice1[tris1[j]] && cuts[k] == vertice1[tris1[j + 2]])
+                for (int j = 0; j < length2; j += 3)
+                {
+                    for (int k = 0; k < cuts.Count; k++)
                     {
-                        if (!Exists(tris1[j], tris1[j + 2], vertice1.Count - 1, 0))
+                        if (cuts[i] == vertice2[tris2[j]] && cuts[k] == vertice2[tris2[j + 1]])
                         {
-                            tris1.Add(tris1[j]);
-                            tris1.Add(tris1[j + 2]);
-                            tris1.Add(vertice1.Count - 1);
-
+                            if (!Exists(tris2[j], vertice2.Count - 1, tris2[j + 1], 1))
+                            {
+                                tris2.Add(tris2[j]);
+                                tris2.Add(vertice2.Count - 1);
+                                tris2.Add(tris2[j + 1]);
+                            }
                         }
-                    }
 
-                    else if (cuts[i] == vertice1[tris1[j + 1]] && cuts[k] == vertice1[tris1[j]])
-                    {
-                        if (!Exists(tris1[j + 1], vertice1.Count - 1, tris1[j], 0))
+                        else if (cuts[i] == vertice2[tris2[j]] && cuts[k] == vertice2[tris2[j + 2]])
                         {
-                            tris1.Add(tris1[j + 1]);
-                            tris1.Add(tris1[j]);
-                            tris1.Add(vertice1.Count - 1);
+                            if (!Exists(tris2[j], tris2[j + 2], vertice2.Count - 1, 1))
+                            {
+                                tris2.Add(tris2[j]);
+                                tris2.Add(tris2[j + 2]);
+                                tris2.Add(vertice2.Count - 1);
+
+                            }
                         }
-                    }
 
-                    else if (cuts[i] == vertice1[tris1[j + 1]] && cuts[k] == vertice1[tris1[j + 2]])
-                    {
-                        if (!Exists(tris1[j + 1], tris1[j + 2], vertice1.Count - 1, 0))
+                        else if (cuts[i] == vertice2[tris2[j + 1]] && cuts[k] == vertice2[tris2[j]])
                         {
-                            tris1.Add(tris1[j + 1]);
-                            tris1.Add(vertice1.Count - 1);
-                            tris1.Add(tris1[j + 2]);
+                            if (!Exists(tris2[j + 1], vertice2.Count - 1, tris2[j], 1))
+                            {
+                                tris2.Add(tris2[j + 1]);
+                                tris2.Add(tris2[j]);
+                                tris2.Add(vertice2.Count - 1);
+                            }
                         }
-                    }
 
-                    else if (cuts[i] == vertice1[tris1[j + 2]] && cuts[k] == vertice1[tris1[j]])
-                    {
-                        if (!Exists(tris1[j + 2], vertice1.Count - 1, tris1[j], 0))
+                        else if (cuts[i] == vertice2[tris2[j + 1]] && cuts[k] == vertice2[tris2[j + 2]])
                         {
-                            tris1.Add(tris1[j + 2]);
-                            tris1.Add(vertice1.Count - 1);
-                            tris1.Add(tris1[j]);
+                            if (!Exists(tris2[j + 1], tris2[j + 2], vertice2.Count - 1, 1))
+                            {
+                                tris2.Add(tris2[j + 1]);
+                                tris2.Add(vertice2.Count - 1);
+                                tris2.Add(tris2[j + 2]);
+                            }
                         }
-                    }
 
-                    else if (cuts[i] == vertice1[tris1[j + 2]] && cuts[k] == vertice1[tris1[j + 1]])
-                    {
-                        if (!Exists(tris1[j + 2], tris1[j + 1], vertice1.Count - 1, 0))
+                        else if (cuts[i] == vertice2[tris2[j + 2]] && cuts[k] == vertice2[tris2[j]])
                         {
-                            tris1.Add(tris1[j + 2]);
-                            tris1.Add(tris1[j + 1]);
-                            tris1.Add(vertice1.Count - 1);
+                            if (!Exists(tris2[j + 2], vertice2.Count - 1, tris2[j], 1))
+                            {
+                                tris2.Add(tris2[j + 2]);
+                                tris2.Add(vertice2.Count - 1);
+                                tris2.Add(tris2[j]);
+                            }
+                        }
+
+                        else if (cuts[i] == vertice2[tris2[j + 2]] && cuts[k] == vertice2[tris2[j + 1]])
+                        {
+                            if (!Exists(tris2[j + 2], tris2[j + 1], vertice2.Count - 1, 1))
+                            {
+                                tris2.Add(tris2[j + 2]);
+                                tris2.Add(tris2[j + 1]);
+                                tris2.Add(vertice2.Count - 1);
+                            }
                         }
                     }
                 }
             }
-
-            for (int j = 0; j < length2; j += 3)
-            {
-                for (int k = 0; k < cuts.Count; k++)
-                {
-                    if (cuts[i] == vertice2[tris2[j]] && cuts[k] == vertice2[tris2[j + 1]])
-                    {
-                        if (!Exists(tris2[j], vertice2.Count - 1, tris2[j + 1], 1))
-                        {
-                            tris2.Add(tris2[j]);
-                            tris2.Add(vertice2.Count - 1);
-                            tris2.Add(tris2[j + 1]);
-                        }
-                    }
-
-                    else if (cuts[i] == vertice2[tris2[j]] && cuts[k] == vertice2[tris2[j + 2]])
-                    {
-                        if (!Exists(tris2[j], tris2[j + 2], vertice2.Count - 1, 1))
-                        {
-                            tris2.Add(tris2[j]);
-                            tris2.Add(tris2[j + 2]);
-                            tris2.Add(vertice2.Count - 1);
-
-                        }
-                    }
-
-                    else if (cuts[i] == vertice2[tris2[j + 1]] && cuts[k] == vertice2[tris2[j]])
-                    {
-                        if (!Exists(tris2[j + 1], vertice2.Count - 1, tris2[j], 1))
-                        {
-                            tris2.Add(tris2[j + 1]);
-                            tris2.Add(tris2[j]);
-                            tris2.Add(vertice2.Count - 1);
-                        }
-                    }
-
-                    else if (cuts[i] == vertice2[tris2[j + 1]] && cuts[k] == vertice2[tris2[j + 2]])
-                    {
-                        if (!Exists(tris2[j + 1], tris2[j + 2], vertice2.Count - 1, 1))
-                        {
-                            tris2.Add(tris2[j + 1]);
-                            tris2.Add(vertice2.Count - 1);
-                            tris2.Add(tris2[j + 2]);
-                        }
-                    }
-
-                    else if (cuts[i] == vertice2[tris2[j + 2]] && cuts[k] == vertice2[tris2[j]])
-                    {
-                        if (!Exists(tris2[j + 2], vertice2.Count - 1, tris2[j], 1))
-                        {
-                            tris2.Add(tris2[j + 2]);
-                            tris2.Add(vertice2.Count - 1);
-                            tris2.Add(tris2[j]);
-                        }
-                    }
-
-                    else if (cuts[i] == vertice2[tris2[j + 2]] && cuts[k] == vertice2[tris2[j + 1]])
-                    {
-                        if (!Exists(tris2[j + 2], tris2[j + 1], vertice2.Count - 1, 1))
-                        {
-                            tris2.Add(tris2[j + 2]);
-                            tris2.Add(tris2[j + 1]);
-                            tris2.Add(vertice2.Count - 1);
-                        }
-                    }
-                }
-            }
-
         }
+        
         CreateShape(targeted);
 
     }
@@ -826,24 +835,52 @@ public class Calc : MonoBehaviour
     void CreateShape(GameObject targeted)
     {
         Vector3 subtract = targeted.transform.position;
-        if (vertice1.Count != 0)
+        if (curDepth == 0)
         {
-            for (int i = 0 ; i < vertice1.Count; i++)
+            if (vertice1.Count != 0)
             {
-                vertice1[i] = targeted.transform.InverseTransformPoint(vertice1[i]);
+                for (int i = 0; i < vertice1.Count; i++)
+                {
+                    vertice1[i] = targeted.transform.InverseTransformPoint(vertice1[i]);
+                }
+                mesh1.vertices = vertice1.ToArray();
+                mesh1.triangles = tris1.ToArray();
+                mesh1.RecalculateNormals();
+                mesh1.RecalculateBounds();
+                temp = Instantiate(empty, targeted.transform.position, Quaternion.identity);
+                temp.GetComponent<MeshFilter>().mesh = mesh1;
+                temp.GetComponent<MeshRenderer>().material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 1f, 1f);
+                temp.AddComponent<MeshCollider>().convex = true;
+                temp.GetComponent<Rigidbody>().mass = targeted.GetComponent<Rigidbody>().mass / 2;
+                temp.transform.rotation = targeted.transform.rotation;
+                temp.transform.localScale = oldScale;
+                temp.GetComponent<Rigidbody>().AddForceAtPosition(p2 - p1, p1);
             }
-            mesh1.vertices = vertice1.ToArray();
-            mesh1.triangles = tris1.ToArray();
-            mesh1.RecalculateNormals();
-            mesh1.RecalculateBounds();
-            GameObject temp = Instantiate(empty, targeted.transform.position, Quaternion.identity);
-            temp.GetComponent<MeshFilter>().mesh = mesh1;
-            temp.GetComponent<MeshRenderer>().material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 1f, 1f);
-            temp.AddComponent<MeshCollider>().convex = true;
-            temp.GetComponent<Rigidbody>().mass = targeted.GetComponent<Rigidbody>().mass / 2;
-            temp.transform.rotation = targeted.transform.rotation;
-            temp.transform.localScale = oldScale;
         }
+        else
+        {
+            if (vertice1.Count != 0)
+            {
+                for (int i = 0; i < vertice1.Count; i++)
+                {
+                    vertice1[i] = targeted.transform.InverseTransformPoint(vertice1[i]);
+                }
+                mesh1.vertices = vertice1.ToArray();
+                mesh1.triangles = tris1.ToArray();
+                mesh1.RecalculateNormals();
+                mesh1.RecalculateBounds();
+                GameObject temp3 = Instantiate(empty, targeted.transform.position, Quaternion.identity);
+                temp3.GetComponent<MeshFilter>().mesh = mesh1;
+                temp3.GetComponent<MeshRenderer>().material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 1f, 1f);
+                temp3.AddComponent<MeshCollider>().convex = true;
+                temp3.GetComponent<Rigidbody>().mass = targeted.GetComponent<Rigidbody>().mass / 2;
+                temp3.transform.rotation = targeted.transform.rotation;
+                temp3.transform.localScale = oldScale;
+                temp3.GetComponent<Rigidbody>().AddForceAtPosition(p2 - p1, p1);
+            }
+        }
+
+        
 
         if (vertice2.Count != 0)
         {
@@ -859,15 +896,23 @@ public class Calc : MonoBehaviour
             mesh2.triangles = tris2.ToArray();
             mesh2.RecalculateNormals();
             mesh2.RecalculateBounds();
-            GameObject temp2 = Instantiate(empty, targeted.transform.position, Quaternion.identity);
+            temp2 = Instantiate(empty, targeted.transform.position, Quaternion.identity);
             temp2.GetComponent<MeshFilter>().mesh = mesh2;
             temp2.GetComponent<MeshRenderer>().material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 1f, 1f);
             temp2.AddComponent<MeshCollider>().convex = true;
             temp2.GetComponent<Rigidbody>().mass = targeted.GetComponent<Rigidbody>().mass/2;
             temp2.transform.rotation = targeted.transform.rotation;
             temp2.transform.localScale = oldScale;
+            temp2.GetComponent<Rigidbody>().AddForceAtPosition(p2 - p1, p2);
         }
+        curDepth++;
         Destroy(targeted);
+        if (!(curDepth >= depth))
+        {
+            normal = Vector3.Cross(p3 - p1, normal);
+            Destruction(temp2);
+            Destruction(temp);
+        }
     }
 
     bool Exists(int p1, int p2, int p3, int identifier)
