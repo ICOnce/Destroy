@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -737319317716814301}
   m_Layer: 0
   m_Name: NewMeshPart
-  m_TagString: Untagged
+  m_TagString: partedMesh
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
