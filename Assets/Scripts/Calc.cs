@@ -12,10 +12,12 @@ public class Calc : MonoBehaviour
     Mesh mesh1;
     Mesh mesh2;
 
-    private static PartTheSeas returning;
+    private GameObject daddy; 
     private GameObject targeted;
     private bool done = true;
     private bool first = true;
+    private float tempMass;
+
 
     private List<Vector3> vertice1 = new List<Vector3>();
     private List<Vector3> vertice2 = new List<Vector3>();
@@ -30,7 +32,6 @@ public class Calc : MonoBehaviour
     private float det;
 
     [SerializeField] private GameObject empty;
-    private Vector3 oldScale;
 
     private Vector3 p1, p2, p3;
     private int length1;
@@ -53,8 +54,6 @@ public class Calc : MonoBehaviour
     }
     private void Update()
     {
-        Debug.Log("First : " + first);
-        Debug.Log(done);
         if (timer - Time.realtimeSinceStartup < -5)
         {
             //Destroy(gameObject);
@@ -62,31 +61,35 @@ public class Calc : MonoBehaviour
 
         if (done == true && first != true)
         {
-            CreateShape();
             done = false;
+            CreateShape();
+            
         }
     }
     private void OnCollisionEnter(Collision collision)
     {
         targeted = collision.gameObject;
-        oldScale = collision.transform.localScale;
         p2 = collision.GetContact(0).point;
         pop = p2;
         p3 = p2 + new Vector3(Random.Range(0, 10), Random.Range(0, 10), Random.Range(0, 10)).normalized;
         normal = Vector3.Cross(p2 - p1, p3 - p1);
         if(collision.gameObject.layer != 3 && done == true)
         {
+            tempMass = collision.gameObject.GetComponent<Rigidbody>().mass;
+            daddy = new GameObject();
+            daddy.transform.position = collision.gameObject.transform.position;
+            daddy.transform.rotation = collision.gameObject.transform.rotation;
+            daddy.transform.localScale = collision.gameObject.transform.localScale;
+            Instantiate(daddy, daddy.transform.position, Quaternion.identity);
             Debug.Log("Running");
             Vector3[] vertex = targeted.GetComponent<MeshFilter>().mesh.vertices;
             int[] tempTri = targeted.GetComponent<MeshFilter>().mesh.triangles;
-            targeted.transform.TransformPoints(vertex);
+            daddy.transform.TransformPoints(vertex);
             Thread thread = new (() =>
             {
-                Debug.Log("Threading");
                 Destruction(vertex, tempTri);
             });
             thread.Start();
-            Debug.Log("thread : " + thread.IsAlive);
             done = false;
         }
 
@@ -869,24 +872,25 @@ public class Calc : MonoBehaviour
 
     void CreateShape()
     {
+        tempMass /= 2;
         mesh1 = new Mesh();
         mesh2 = new Mesh();
         if (curDepth == 0)
         {
             if (vertice1.Count != 0)
             {
-                targeted.transform.InverseTransformPoints(vertice1.ToArray());
+                daddy.transform.InverseTransformPoints(vertice1.ToArray());
                 mesh1.vertices = vertice1.ToArray();
                 mesh1.triangles = tris1.ToArray();
                 mesh1.RecalculateNormals();
                 mesh1.RecalculateBounds();
-                temp = Instantiate(empty, targeted.transform.position, Quaternion.identity);
+                temp = Instantiate(empty, daddy.transform.position, Quaternion.identity);
                 temp.GetComponent<MeshFilter>().mesh = mesh1;
                 temp.GetComponent<MeshRenderer>().material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 1f, 1f);
                 temp.AddComponent<MeshCollider>().convex = true;
-                temp.GetComponent<Rigidbody>().mass = targeted.GetComponent<Rigidbody>().mass / 2;
+                temp.GetComponent<Rigidbody>().mass = tempMass;
                 temp.transform.rotation = targeted.transform.rotation;
-                temp.transform.localScale = oldScale;
+                temp.transform.localScale = daddy.transform.localScale;
                 temp.GetComponent<Rigidbody>().AddForceAtPosition((p2 - p1).normalized * impact, p1);
             }
         }
@@ -894,18 +898,18 @@ public class Calc : MonoBehaviour
         {
             if (vertice1.Count != 0)
             {
-                targeted.transform.InverseTransformPoints(vertice1.ToArray());
+                daddy.transform.InverseTransformPoints(vertice1.ToArray());
                 mesh1.vertices = vertice1.ToArray();
                 mesh1.triangles = tris1.ToArray();
                 mesh1.RecalculateNormals();
                 mesh1.RecalculateBounds();
-                GameObject temp3 = Instantiate(empty, targeted.transform.position, Quaternion.identity);
+                GameObject temp3 = Instantiate(empty, daddy.transform.position, Quaternion.identity);
                 temp3.GetComponent<MeshFilter>().mesh = mesh1;
                 temp3.GetComponent<MeshRenderer>().material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 1f, 1f);
                 temp3.AddComponent<MeshCollider>().convex = true;
-                temp3.GetComponent<Rigidbody>().mass = targeted.GetComponent<Rigidbody>().mass / 2;
-                temp3.transform.rotation = targeted.transform.rotation;
-                temp3.transform.localScale = oldScale;
+                temp3.GetComponent<Rigidbody>().mass = tempMass;
+                temp3.transform.rotation = daddy.transform.rotation;
+                temp3.transform.localScale = daddy.transform.localScale;
                 temp3.GetComponent<Rigidbody>().AddForceAtPosition((p2 - p1).normalized * impact, p1);
             }
         }
@@ -918,18 +922,18 @@ public class Calc : MonoBehaviour
             {
                 
             }*/
-            targeted.transform.InverseTransformPoints(vertice2.ToArray());
+            daddy.transform.InverseTransformPoints(vertice2.ToArray());
             mesh2.vertices = vertice2.ToArray();
             mesh2.triangles = tris2.ToArray();
             mesh2.RecalculateNormals();
             mesh2.RecalculateBounds();
-            temp2 = Instantiate(empty, targeted.transform.position, Quaternion.identity);
+            temp2 = Instantiate(empty, daddy.transform.position, Quaternion.identity);
             temp2.GetComponent<MeshFilter>().mesh = mesh2;
             temp2.GetComponent<MeshRenderer>().material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 1f, 1f);
             temp2.AddComponent<MeshCollider>().convex = true;
-            temp2.GetComponent<Rigidbody>().mass = targeted.GetComponent<Rigidbody>().mass/2;
-            temp2.transform.rotation = targeted.transform.rotation;
-            temp2.transform.localScale = oldScale;
+            temp2.GetComponent<Rigidbody>().mass = tempMass;
+            temp2.transform.rotation = daddy.transform.rotation;
+            temp2.transform.localScale = daddy.transform.localScale;
             temp2.GetComponent<Rigidbody>().AddForceAtPosition((p2 - p1).normalized * impact, p2);
         }
         curDepth++;
@@ -937,8 +941,10 @@ public class Calc : MonoBehaviour
         if (!(curDepth >= depth))
         {
             normal = Vector3.Cross(p3 - p1, normal + new Vector3(Random.Range(-10,10), Random.Range(-10, 10), Random.Range(-10, 10)));
+            Destruction(temp.GetComponent<MeshFilter>().mesh.vertices, temp.GetComponent<MeshFilter>().mesh.triangles);
+            Destroy(temp);
             Destruction(temp2.GetComponent<MeshFilter>().mesh.vertices, temp2.GetComponent<MeshFilter>().mesh.triangles);
-            Destruction(temp.GetComponent<MeshFilter>().mesh.vertices, temp2.GetComponent<MeshFilter>().mesh.triangles);
+            Destroy(temp2);
         }
     }
 
