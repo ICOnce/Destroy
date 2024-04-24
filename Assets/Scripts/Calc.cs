@@ -2,11 +2,20 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using System.Threading;
+using UnityEngine.UIElements;
+using System.Runtime;
+using System.Security;
 
 public class Calc : MonoBehaviour
 {
     Mesh mesh1;
     Mesh mesh2;
+
+    private static PartTheSeas returning;
+    private GameObject targeted;
+    private bool done = true;
+    private bool first = true;
 
     private List<Vector3> vertice1 = new List<Vector3>();
     private List<Vector3> vertice2 = new List<Vector3>();
@@ -44,30 +53,48 @@ public class Calc : MonoBehaviour
     }
     private void Update()
     {
+        Debug.Log("First : " + first);
+        Debug.Log(done);
         if (timer - Time.realtimeSinceStartup < -5)
         {
-            Destroy(gameObject);
+            //Destroy(gameObject);
+        }
+
+        if (done == true && first != true)
+        {
+            CreateShape();
+            done = false;
         }
     }
     private void OnCollisionEnter(Collision collision)
     {
+        targeted = collision.gameObject;
         oldScale = collision.transform.localScale;
         p2 = collision.GetContact(0).point;
         pop = p2;
         p3 = p2 + new Vector3(Random.Range(0, 10), Random.Range(0, 10), Random.Range(0, 10)).normalized;
         normal = Vector3.Cross(p2 - p1, p3 - p1);
-        if(collision.gameObject.layer != 3)
+        if(collision.gameObject.layer != 3 && done == true)
         {
-            Destruction(collision.gameObject);
+            Debug.Log("Running");
+            Vector3[] vertex = targeted.GetComponent<MeshFilter>().mesh.vertices;
+            int[] tempTri = targeted.GetComponent<MeshFilter>().mesh.triangles;
+            targeted.transform.TransformPoints(vertex);
+            Thread thread = new (() =>
+            {
+                Debug.Log("Threading");
+                Destruction(vertex, tempTri);
+            });
+            thread.Start();
+            Debug.Log("thread : " + thread.IsAlive);
+            done = false;
         }
 
-        Destroy(gameObject);
+        //Destroy(gameObject);
     }
 
-    private void Destruction(GameObject targeted)
+    private void Destruction(Vector3[] vertex, int[] trian)
     {
-        mesh1 = new Mesh();
-        mesh2 = new Mesh();
         vertice1.Clear();
         vertice2.Clear();
         tris1.Clear();
@@ -75,14 +102,11 @@ public class Calc : MonoBehaviour
         cuts.Clear();
         int trias1 = 0;
         int trias2 = 0;
-        for (int i = 0; i < targeted.GetComponent<MeshFilter>().mesh.triangles.Length; i+= 3)
+        for (int i = 0; i < trian.Length; i+= 3)
         {
-            Vector3 v1 = targeted.GetComponent<MeshFilter>().mesh.vertices[targeted.GetComponent<MeshFilter>().mesh.triangles[i + 0]];
-            v1 = targeted.transform.TransformPoint(v1);
-            Vector3 v2 = targeted.GetComponent<MeshFilter>().mesh.vertices[targeted.GetComponent<MeshFilter>().mesh.triangles[i + 1]];
-            v2 = targeted.transform.TransformPoint(v2);
-            Vector3 v3 = targeted.GetComponent<MeshFilter>().mesh.vertices[targeted.GetComponent<MeshFilter>().mesh.triangles[i + 2]];
-            v3 = targeted.transform.TransformPoint(v3);
+            Vector3 v1 = vertex[trian[i + 0]];
+            Vector3 v2 = vertex[trian[i + 1]];
+            Vector3 v3 = vertex[trian[i + 2]];
             if (!(SideDecider(v1) > 0 && SideDecider(v2) > 0 && SideDecider(v3) > 0 || SideDecider(v1) < 0 && SideDecider(v2) < 0 && SideDecider(v3) < 0))
             {
                 //3: OOU
@@ -667,9 +691,9 @@ public class Calc : MonoBehaviour
         }
         if (cuts.Count != 0)
         {
-            foreach (Vector3 vertex in cuts)
+            foreach (Vector3 _vertex in cuts)
             {
-                sum += vertex;
+                sum += _vertex;
             }
             sum /= cuts.Count;
             vertice1.AddRange(cuts);
@@ -816,9 +840,8 @@ public class Calc : MonoBehaviour
                 }
             }
         }
-        
-        CreateShape(targeted);
-
+        done = true;
+        first = false;
     }
 
     public float SideDecider(Vector3 vertex)
@@ -844,17 +867,15 @@ public class Calc : MonoBehaviour
         return intersect;
     }
 
-    void CreateShape(GameObject targeted)
+    void CreateShape()
     {
-        Vector3 subtract = targeted.transform.position;
+        mesh1 = new Mesh();
+        mesh2 = new Mesh();
         if (curDepth == 0)
         {
             if (vertice1.Count != 0)
             {
-                for (int i = 0; i < vertice1.Count; i++)
-                {
-                    vertice1[i] = targeted.transform.InverseTransformPoint(vertice1[i]);
-                }
+                targeted.transform.InverseTransformPoints(vertice1.ToArray());
                 mesh1.vertices = vertice1.ToArray();
                 mesh1.triangles = tris1.ToArray();
                 mesh1.RecalculateNormals();
@@ -873,10 +894,7 @@ public class Calc : MonoBehaviour
         {
             if (vertice1.Count != 0)
             {
-                for (int i = 0; i < vertice1.Count; i++)
-                {
-                    vertice1[i] = targeted.transform.InverseTransformPoint(vertice1[i]);
-                }
+                targeted.transform.InverseTransformPoints(vertice1.ToArray());
                 mesh1.vertices = vertice1.ToArray();
                 mesh1.triangles = tris1.ToArray();
                 mesh1.RecalculateNormals();
@@ -900,10 +918,7 @@ public class Calc : MonoBehaviour
             {
                 
             }*/
-            for (int i = 0; i <  vertice2.Count; i++)
-            {
-                vertice2[i] = targeted.transform.InverseTransformPoint(vertice2[i]);
-            }
+            targeted.transform.InverseTransformPoints(vertice2.ToArray());
             mesh2.vertices = vertice2.ToArray();
             mesh2.triangles = tris2.ToArray();
             mesh2.RecalculateNormals();
@@ -921,9 +936,9 @@ public class Calc : MonoBehaviour
         Destroy(targeted);
         if (!(curDepth >= depth))
         {
-            normal = Vector3.Cross(p3 - p1, normal);
-            Destruction(temp2);
-            Destruction(temp);
+            normal = Vector3.Cross(p3 - p1, normal + new Vector3(Random.Range(-10,10), Random.Range(-10, 10), Random.Range(-10, 10)));
+            Destruction(temp2.GetComponent<MeshFilter>().mesh.vertices, temp2.GetComponent<MeshFilter>().mesh.triangles);
+            Destruction(temp.GetComponent<MeshFilter>().mesh.vertices, temp2.GetComponent<MeshFilter>().mesh.triangles);
         }
     }
 
